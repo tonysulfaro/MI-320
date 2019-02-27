@@ -1,0 +1,132 @@
+---
+title: "Basics in R Markdown and R"
+author: "Adam Maidman"
+date: "Friday, September 19, 2014"
+output: html_document
+---
+
+
+
+### Getting Started
+- Install the latest version of RStudio (Version 0.98.1028) or install the rmarkdown package from github
+
+- To produce pdf's, install Latex
+
+- If you don't have write privileges to the computer you will be using, you can install RStudio on a flashdrive
+
+- We can also inlcude style sheets like css for html or .sty files for pdfs.
+We change the header to 
+
+               title: "Basics in R Markdown and R"
+
+              author: "Adam Maidman"
+
+                date: "Friday, September 19, 2014"
+
+              output: pdf_document:
+
+                          includes:
+
+                         in_header: mystyle.sty
+
+
+
+### R Code in Markdown
+- There are several different ways to control output
+- Hide code
+- Not evaluate code
+- Hide output
+- Hide input
+- Change size of plots
+- ...
+
+Include all input and output
+```{r }
+library("alr4")
+```
+
+Exclude messages
+```{r message=FALSE}
+library("alr4")
+```
+
+Exclude input, include output
+```{r echo=FALSE}
+x <- 10
+y <- 5
+x*y
+```
+
+Inlcude line 3 only
+```{r echo=3}
+x <- 10
+y <- 5
+x*y
+```
+
+Don't evaulate the R code
+```{r eval=FALSE}
+x <- 10
+y <- 5
+x*y
+```
+
+Hide the output, but evaluate the R code
+```{r results='hide'}
+x <- 10
+y <- 5
+x*y
+```
+
+Plots
+```{r }
+data(swiss)
+plot(Fertility ~ Agriculture, swiss)
+```
+
+Change the size of plots
+```{r fig.width=3, fig.height=3}
+data(swiss)
+plot(Fertility ~ Agriculture, swiss)
+```
+
+
+### Graphics in R
+Basic Colors
+```{r}
+plot(1:18, pch=1:18, col=1:18, cex=3, lwd=3)
+```
+
+Superior colors from LSD package
+```{r echo=FALSE,, message=FALSE, results='hide'}
+library(LSD)
+data(Prestige)
+```
+```{r }
+plot(1:18, pch=1:18, col=distinctcolors(n = 18), cex=3, lwd=3)
+```
+
+Plot vs Scatterplot
+```{r echo=FALSE,, message=FALSE, results='hide'}
+library(car)
+```
+```{r }
+plot(Fertility ~ Agriculture, swiss)
+scatterplot(Fertility ~ Agriculture, swiss)
+abline(lm(Fertility ~ Agriculture, swiss))
+```
+
+Labeling points in Scatterplot
+```{r }
+scatterplot(prestige ~ income, Prestige, boxplot=FALSE, smooth=FALSE, id.n=3)
+```
+
+Plotting by type in Scatterplot
+```{r }
+scatterplot(prestige ~ income|type, Prestige, boxplot=FALSE, smooth=FALSE)
+```
+
+
+
+### Questions
+http://yihui.name/
