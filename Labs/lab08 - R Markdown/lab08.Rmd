@@ -30,14 +30,14 @@ ncol(election2016)
 
 Below is a basic scatterplot. The x-axis is the percent of the population that lives in an urban area, and the y-axis is the percentage point difference in votes between Clinton and Trump. In this graph, the first thing that stands out is that the points are arranged in a diagonal line pattern from the lower left to the upper right of the graph. The graph shows that as more of a state's population lives in an urban area, Clinton was more likely to win the election in that state.
 
-```{r echo=FALSE}
+```{r echo=TRUE}
 ggplot(data=election2016) + 
   geom_point(aes(x=pct_pop_metro, y=d_points))
 ```
 
 The graph below is the same graph, but with a title, caption, and more user-friendly x-axis and y-axis labels added. You can learn about how to do this at [this web page](https://ggplot2.tidyverse.org/reference/labs.html).
 
-```{r echo=FALSE}
+```{r echo=TRUE}
 ggplot(data=election2016) + 
   geom_hline(yintercept=0, color="darkgray") + 
   geom_point(aes(x=pct_pop_metro, y=d_points)) + 
@@ -51,11 +51,11 @@ ggplot(data=election2016) +
 This graph is a revised version of the previous scatterplots, made to look more beautiful, functional, and insightful. A third variable has been added, to color the points according to the winner of the 2016 election in each state. A fourth variable has also been added; the size of the points represents the proportion of the population in each state that is a racial minority. The pattern that this variable shows is that Clinton won more of the states that had a larger proportion of minority voters. 
 
 
-```{r echo=FALSE}
+```{r echo=TRUE}
 party_colors = c("blue", "red")
 ```
 
-```{r echo=FALSE}
+```{r echo=TRUE}
 ggplot(data=election2016) + 
   geom_hline(yintercept=0, color="darkgray") + 
   geom_point(aes(x=pct_pop_metro, y=d_points, color=winner, size=pct_non_white)) + 
@@ -80,7 +80,7 @@ The graph below uses the following variables:
 
 There is a diagonal pattern from the top left to the bottom right of the graph. This means that fewer people voted in states with a greater minority population, relatively speaking. Also, the size of the points represents the vote margin for the winner, and the blue circles seem like they tend to be bigger than the red circles. This means that where Clinton won, she won by a bigger margin than where Trump won.
 
-```{r echo=FALSE}
+```{r echo=TRUE}
 ggplot(data=election2016) + 
     geom_point(aes(x=pct_voted, y=pct_non_white, color=winner, size=vote_margin)) + 
     scale_color_manual(values=party_colors) + theme_bw() + 
