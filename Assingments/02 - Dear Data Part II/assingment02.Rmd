@@ -1,0 +1,119 @@
+---
+title: "Assingment 02"
+author: "tony sulfaro"
+date: "3/1/2019"
+output: html_document
+---
+
+# load the libraries
+```{r }
+library(tidyverse)
+library("lubridate")
+```
+
+# load the data
+```{r }
+music_data <- read_csv("out_data.csv")
+```
+
+Notice how all the dataframe types are col_character(). Lets fix that real quick
+
+```{r}
+#transform(music_data, timestamp = as.Date(timestamp))
+```
+
+# Add Additional Columns
+```{r }
+# ID column
+# https://stackoverflow.com/questions/23518605/add-an-index-numeric-id-column-to-large-data-frame
+#music_data <- tibble::rowid_to_column(music_data, "ID")
+#music_data$day <- weekdays(as.Date(music_data$timestamp))
+
+# date col to factor variable
+
+# count times by day
+```
+# Questions
+
+## What day(s) do I listen to music and how many days did I listen for more than 30 minutes that day?
+```{r }
+# aggregate geom bar
+# https://stackoverflow.com/questions/40260048/geom-bar-tied-exactly-to-x-and-y-axis-without-aggregating
+ggplot(data = music_data) +
+  geom_bar(mapping = aes(x=day, y=duration),stat = "identity")+
+  geom_hline(aes(yintercept=30), colour="#838B8B")+
+  
+  ggtitle("Total minutes listened by day") +
+  xlab("Day of Week") +
+  ylab("Total Minutes")
+```
+
+## How many listening sessions were over 30 min?
+```{r}
+ggplot(data = music_data) +
+  geom_point(mapping = aes(x=timestamp, y=duration, colour = duration > 30))+
+  scale_color_manual(values = c("blue", "red"))
+````
+
+
+## What genre(s) of music do I listen to the most?
+```{r }
+ggplot(data = music_data) +
+  geom_bar(mapping = aes(x=music_genre))+
+  ggtitle("Total minutes listened by music genre") +
+  xlab("Music Genre") +
+  ylab("Total Minutes")
+```
+
+# Appendix
+
+### Description
+This dataset contains 12 days worth of data about my personal music listening habits. The data was recorded between the dates 2019-1-12 and 2019-1-24. There are several columns I recorded so lets take a look at them.
+
+```{r}
+str(music_data)
+```
+
+## Usage:
+```{r}
+music_data
+```
+
+## Format:
+
+### Dimensions:
+Number of rows = `r nrow(music_data)`
+
+Number of columns = `r ncol(music_data)`
+
+### Column definitions:
+* year - year timestamp
+* month - month timestamp
+* day - day timestamp
+* hour - hour timestamp
+* minute - minute timestamp
+* second - second timestamp
+* music_genre - genre of music listened to
+* task - what I was doing while listening to music
+* location - where I was listening to music
+* duration - how long I listened to music
+* service - what service was used to listen to the music
+
+# Essay
+
+### Background:
+The theme of this particular assingment was to apply what we learned during lab and use those methods an apply it to our dataset.
+
+### Questions:
+To help me better understand my listening habits I posed two questions:
+
+* What day(s) do I listen to music and how many days did I listen for more than 30 minutes that day?
+* What genre(s) of music do I listen to the most?
+
+### Generating the Graph:
+While reading in the data into a dataframe is pretty cool from a technical standpoint, to the average user (and even technical ones) it is hard to derive meaning from looking at the raw data. To solve this issue I created several visualizations to illustrate patterns and trends in my personal music listening habits.
+
+### Influence from Lecture 04:
+Initially, I did not have much direction with how I was visualizing data. I used bar charts, pie charts, and tree maps to try and show which genre(s) were most popular or what days in particular I listened to music the most. While these visualizations from assingment 1 helped quantify the data, the colors used were confusing and didn't help to suppliment to the information.
+
+Lecture 04 helped me use color meaningfully by coloring points to help quantify data. For example, to show that a point has a higher value you can color it darker than ones with lower values. This can show at a glance which points have high and low values without having to reference the y-axis. Additionally, if you add a line to represent a threshhold, you can color points above and below the line different colors to show margins more clearly when points are crowded together.
