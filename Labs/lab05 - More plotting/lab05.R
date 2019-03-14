@@ -133,7 +133,7 @@ ggplot(data = election2016) +
   xlab("State Percentage in Metro Area") +
   ylab("Vote Point Percentages towards Clinton")+
   geom_hline(aes(yintercept=0), colour="#838B8B")+
-  theme_bw()+
+  theme_minimal()+
   scale_y_continuous(breaks=seq(-100,100,10))+
   scale_x_continuous(breaks=seq(-100,100,10))+
   theme(legend.position = "top")

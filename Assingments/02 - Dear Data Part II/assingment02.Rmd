@@ -8,7 +8,6 @@ output: html_document
 # load the libraries
 ```{r }
 library(tidyverse)
-library("lubridate")
 ```
 
 # load the data
@@ -33,35 +32,39 @@ Notice how all the dataframe types are col_character(). Lets fix that real quick
 
 # count times by day
 ```
-# Questions
+# Questions:
 
-## What day(s) do I listen to music and how many days did I listen for more than 30 minutes that day?
+How many listening sessions were 30 minutes or more?
+
+What genre(s) of music do I listen to the most?
+
+# Graph:
+How many listening sessions were 30 minutes or more?
+```{r}
+ggplot(data = music_data) +
+  geom_point(mapping = aes(x=timestamp, y=duration, colour = duration >= 30))+
+  scale_color_manual(values = c("red", "blue"))+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  geom_hline(yintercept = 30)+
+  ggtitle("Listening Duration per Session") +
+  xlab("Listening Session") +
+  ylab("Total Minutes")
+```
+
+### Let's revise this graph a bit, try a stacked bar chart and group by per day instead of just per session.
+
 ```{r }
 # aggregate geom bar
 # https://stackoverflow.com/questions/40260048/geom-bar-tied-exactly-to-x-and-y-axis-without-aggregating
 ggplot(data = music_data) +
-  geom_bar(mapping = aes(x=day, y=duration),stat = "identity")+
+  geom_bar(mapping = aes(x=day, y=duration, fill=music_genre),stat = "identity")+
   geom_hline(aes(yintercept=30), colour="#838B8B")+
-  
+  theme_minimal()+
+  scale_x_continuous(breaks=seq(0,31,1))+
+  scale_y_continuous(breaks=seq(0,200,10))+
   ggtitle("Total minutes listened by day") +
-  xlab("Day of Week") +
-  ylab("Total Minutes")
-```
-
-## How many listening sessions were over 30 min?
-```{r}
-ggplot(data = music_data) +
-  geom_point(mapping = aes(x=timestamp, y=duration, colour = duration > 30))+
-  scale_color_manual(values = c("blue", "red"))
-````
-
-
-## What genre(s) of music do I listen to the most?
-```{r }
-ggplot(data = music_data) +
-  geom_bar(mapping = aes(x=music_genre))+
-  ggtitle("Total minutes listened by music genre") +
-  xlab("Music Genre") +
+  labs(caption="Bars over the line indicate listening sessions over 30 minutes.")+
+  xlab("Day of Month in January") +
   ylab("Total Minutes")
 ```
 
@@ -102,18 +105,24 @@ Number of columns = `r ncol(music_data)`
 # Essay
 
 ### Background:
-The theme of this particular assingment was to apply what we learned during lab and use those methods an apply it to our dataset.
+The theme of this particular assignment was to apply what we learned during lab and use those methods an apply it to our dataset.
 
 ### Questions:
-To help me better understand my listening habits I posed two questions:
+To help me better understand the listening habits I posed two questions:
 
-* What day(s) do I listen to music and how many days did I listen for more than 30 minutes that day?
+* How long do I listen to music each day?
 * What genre(s) of music do I listen to the most?
 
 ### Generating the Graph:
-While reading in the data into a dataframe is pretty cool from a technical standpoint, to the average user (and even technical ones) it is hard to derive meaning from looking at the raw data. To solve this issue I created several visualizations to illustrate patterns and trends in my personal music listening habits.
+While reading in the data into a data frame is pretty cool from a technical standpoint, for the average user (and even technical ones) it is hard to derive meaning from looking at only the raw data. To solve this issue I created a visualization to bring out key trends in the data to help answer questions posed by myself.
 
+To answer the question 'what days do I listen to music and how many days did I listen more than 30 minutes?' I decided that a stacked bar chart would be able to accomplish this when aggregating by day. This means if there were two listening sessions for a particular day then their durations would be totaled as one bar for that particular day. This also allowed me to add a horizontal line at duration = 30 to indicate which bars were higher or lower than that line to show which days I listened more or less than 30 minutes of music.
+
+
+When answering 'what genre(s) of music do I listen the most?' Because I had already implemented a stacked bar graph by category of music listened to representing the categories was trivial because when setting the fill = category it shows clearly which categories were listened to for each particular day and for how long.
+ 
 ### Influence from Lecture 04:
-Initially, I did not have much direction with how I was visualizing data. I used bar charts, pie charts, and tree maps to try and show which genre(s) were most popular or what days in particular I listened to music the most. While these visualizations from assingment 1 helped quantify the data, the colors used were confusing and didn't help to suppliment to the information.
+Initially, I did not have much direction with how I was visualizing data. I used bar charts, pie charts, and treemaps to try and show which genre(s) were most popular or what days, in particular, I listened to music the most. While these visualizations from assignment 1 helped quantify the data, the colors used were confusing and didn't help to supplement the information.
 
-Lecture 04 helped me use color meaningfully by coloring points to help quantify data. For example, to show that a point has a higher value you can color it darker than ones with lower values. This can show at a glance which points have high and low values without having to reference the y-axis. Additionally, if you add a line to represent a threshhold, you can color points above and below the line different colors to show margins more clearly when points are crowded together.
+Lecture 04 helped me use color meaningfully when constructing a graph. In this particular graph that I constructed each genre of music had its own color so that when it was included within a bar in the bar graph the viewer would be able to see how much time a particular genre listened to that day.
+
