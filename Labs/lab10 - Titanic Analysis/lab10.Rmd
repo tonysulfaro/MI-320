@@ -1,30 +1,212 @@
 ---
-title: "lab10 - Titanic Data"
+title: "Lab10 - Titanic Data"
 author: "tony sulfaro"
 date: "3/14/2019"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+### Get some dependencies
+```{r}
+library(tidyverse)
+#install.packages("gapminder")
+library("gapminder")
+?gapminder
+#install.packages("magrittr") # only needed the first time you use it
+#install.packages("dplyr")    # alternative installation of the %>%
+library(magrittr) # need to run every time you start R and want to use %>%
+library(dplyr)    # alternative, this also loads %>%
 ```
 
-## R Markdown
+## Question 01
+### Jobs dataset
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Let us read in the jobs dataset and see what it is all about
+```{r}
+jobs = read.csv("jobs.csv", header=TRUE)
+```
+Per the documentation the jobs.csv dataset includes "reported occupations in the United States Labor Force from 1850-2000. The data is originally from the United States Census Bureau and was provided by the University of Minnesota Population Center (ipums.org)".
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+The dataset is arranged into `r nrow(jobs)` rows and `r ncol(jobs)` columns.
 
-```{r cars}
-summary(cars)
+This particular data was arranged in 1950 into the respective categories (columns):
+
+* year: census year
+* sex: M (male) or F (female)
+* occupation: the occupation type
+* people: people with that occupation in that year
+* n.by.year: total number of people for that year
+* proportion: proportion of males or females in a given year who reported a given occupation
+
+### Here is what a row looks like of this dataset
+```{r}
+head(jobs, 1)
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+## Question 02
+### Mean and standard deviation of jobs dataset between 1910 and 2000 for occupation = Clerical Worker 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+Filter the dataset
+```{r}
+jobs %>% filter(occupation=="Clerical Worker") %>% filter(year >= 1910 & year <= 2000) %>% summarize(Mean = mean(proportion), Standard_Deviation = sd(proportion))
+```
+We can see here the average proportion of clerical worker between the years 1910 and 2000 as well as the standard deviation.
+
+## Question 03
+There are `r nrow(jobs %>% distinct(occupation))` different occupations in the dataset.
+
+## Question 04
+Occupation with the maximum proportion.
+```{r}
+head(jobs %>% group_by(occupation) %>% arrange(desc(proportion)), 1)
+```
+It would appear that the occupation: `r head(jobs %>% group_by(occupation) %>% arrange(desc(proportion)), 1)[3]` has the highest proportion of men for this sample.
+
+# Titanic Dataset
+## Question 05
+
+First things first lets actually get the data.
+
+```{r}
+titanic = read.csv("Titanic_Passengers.csv")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Distribution of ages on the Titanic.
+
+```{r}
+titanic %>% ggplot(aes(Age)) + geom_histogram()
+```
+
+## Question 06
+
+There are too many bins in that. Time to get it under control.
+
+```{r}
+titanic %>% ggplot(aes(Age)) + geom_histogram(bins = 50)
+```
+
+## Question 07
+
+The graph is getting closer. This time let's modify the width of bins.
+```{r}
+titanic %>% ggplot(aes(Age)) + geom_histogram(bins = 50, binwidth = 5)
+```
+
+the binwidth parameter in geom_histogram() is
+
+"The width of the bins. Can be specified as a numeric value, or a function that calculates width from x. The default is to use bins bins that cover the range of the data. You should always override this value, exploring multiple widths to find the best to illustrate the stories in your data."
+
+per the ggplot2 documentation.
+
+## Question 08
+
+The graphs in questions 5,6,7 differ in that the first graph (5) defaults to a bin count of 30. The next graph (6) ovverides that by setting bins = 50 which makes more columns for the ages within the range of the data. Graph (7) is different from all those in that it manually sets the number of bins = 50 and sets the binwidth = 5, making the bars wider.
+
+## Question 09
+
+The average age of females on the titanic: `r head(titanic %>% filter(Sex=="female") %>% summarize(Mean = mean(Age, na.rm=TRUE)))[,1]` years.
+
+The average age of males on the titanic: `r head(titanic %>% filter(Sex=="male") %>% summarize(Mean = mean(Age, na.rm=TRUE)))[,1]` years.
+
+Disclaimer: Null ages were removed to calculate this information from the sample.
+
+## Question 10
+
+Mean and standard deviation of the fares people paid for tickets in each passenger class on the Titanic, and how many passengers bought tickets in each fare class.
+
+```{r}
+titanic %>% group_by(Class =Pclass) %>% summarise(Mean = mean(Fare), Standard_Deviation = sd(Fare), Count = n())
+```
+
+We can see that as the class level "increases" (becomes more luxurious) it does on average increase on price.
+
+## Question 11
+
+```{r}
+
+# get highest mean
+highest_mean = head(titanic %>% group_by(Class =Pclass) %>% summarise(Mean = mean(Fare), Standard_Deviation = sd(Fare), Count = n()) %>% arrange(desc(Mean)),1)[,2]
+
+# get highest mean class 
+highest_mean_class = head(titanic %>% group_by(Class =Pclass) %>% summarise(Mean = mean(Fare), Standard_Deviation = sd(Fare), Count = n()) %>% arrange(desc(Mean)),1)[,1]
+
+# get highest variability class
+highest_var_class = head(titanic %>% group_by(Class =Pclass) %>% summarise(Mean = mean(Fare), Standard_Deviation = sd(Fare), Count = n()) %>% arrange(desc(Standard_Deviation)),1)[,1]
+
+# get highest_variability
+highest_variability = head(titanic %>% group_by(Class =Pclass) %>% summarise(Mean = mean(Fare), Standard_Deviation = sd(Fare), Count = n()) %>% arrange(desc(Standard_Deviation)),1)[,3]
+
+# highest passenger count
+
+highest_pass_class = head(titanic %>% group_by(Class =Pclass) %>% summarise(Mean = mean(Fare), Standard_Deviation = sd(Fare), Count = n()) %>% arrange(desc(Count)),1)[,1]
+
+highest_pass_count = head(titanic %>% group_by(Class =Pclass) %>% summarise(Mean = mean(Fare), Standard_Deviation = sd(Fare), Count = n()) %>% arrange(desc(Count)),1)[,4]
+```
+
+### Calculation table
+```{r}
+titanic %>% group_by(Class =Pclass) %>% summarise(Mean = mean(Fare), Standard_Deviation = sd(Fare), Count = n()) %>% arrange(desc(Count))
+```
+
+
+Which fare class was the most expensive?
+
+* The most expensive class was class = `r highest_mean_class` or the upper class. Look at highest mean = `r highest_mean` and in the same row it is class = `r highest_mean_class`.
+
+Which had the highest variability? 
+
+* The class with the highest variability was class = `r highest_var_class`. You can match up the highest standard deviation = `r highest_variability` with class = `r highest_var_class`.
+
+Which class had the most passengers?
+
+* Class = `r highest_pass_class` had the most passengers at count = `r highest_pass_count`.
+
+## Question 12
+
+Show countries in Europe GDP per cap distribution.
+
+```{r}
+gapminder %>% 
+  arrange(desc(country)) %>%   
+  mutate(country = factor(country, levels = unique(country))) %>%
+  filter(continent=="Europe") %>%
+  ggplot(aes(x=country, y=gdpPercap)) + 
+  geom_boxplot() + coord_flip()
+```
+
+## Question 13
+
+Already arranged in alphabetical order.
+
+```{r}
+gapminder %>% 
+  arrange(desc(country)) %>%   
+  mutate(country = factor(country, levels = unique(country))) %>%
+  filter(continent=="Europe") %>%
+  ggplot(aes(x=country, y=gdpPercap)) + 
+  geom_boxplot() + coord_flip()
+```
+
+## Question 14
+
+Filter plot to only countries: Hungary, Iceland, Greece, and Switzerland.
+
+```{r}
+gapminder %>% 
+  arrange(desc(country)) %>%   
+  mutate(country = factor(country, levels = unique(country))) %>%
+  filter(continent=="Europe") %>% 
+  filter(country == "Hungary" | country == "Iceland" | country == "Greece" | country == "Switzerland") %>%
+  ggplot(aes(x=country, y=gdpPercap)) + 
+  geom_boxplot() + coord_flip()
+```
+
+## Question 15
+
+The line in the middle of the boxes represent the median value. In this case, it is the median GDP per capita in US dollars.
+
+## Question 16
+
+## Question 17
+
+## Question 18
