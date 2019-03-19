@@ -50,7 +50,7 @@ Filter the dataset
 ```{r}
 jobs %>% filter(occupation=="Clerical Worker") %>% filter(year >= 1910 & year <= 2000) %>% summarize(Mean = mean(proportion), Standard_Deviation = sd(proportion))
 ```
-We can see here the average proportion of clerical worker between the years 1910 and 2000 as well as the standard deviation.
+We can see here the average proportion of clerical worker between the years 1910 and 2000 (0.02625589) as well as the standard deviation (0.01486836).
 
 ## Question 03
 There are `r nrow(jobs %>% distinct(occupation))` different occupations in the dataset.
@@ -207,6 +207,30 @@ The line in the middle of the boxes represent the median value. In this case, it
 
 ## Question 16
 
+### Titanic passenger class with the highest survival percentage
+
+Let's start out with a simple stacked bar chart to visually quantify the data.
+
+```{r}
+titanic %>% mutate(Survived = (Survived==1)) %>%
+  ggplot(aes(x=Pclass, group=Survived, color=Survived)) + geom_bar(aes(fill = Survived))
+```
+
+It looks like people on the lowest deck (3rd) had a higher percentage of deaths than all other classes. Lets calculate the actual percentages.
+
+```{r}
+titanic %>% group_by(Class =Pclass) %>% summarise(Passenger_Count = n(), Survived_Count = nrow(subset(titanic,Survived==1 & Pclass==Class)), Perished_Count = nrow(subset(titanic,Survived==0 & Pclass==Class)), Survival_Percentage = 100*(Survived_Count/Passenger_Count))
+```
+
+Yes, the lower deck (class 3) has the lowest percentage of people that survived.
+
 ## Question 17
 
+```{r}
+titanic %>% mutate(Survived = (Survived==1)) %>%
+  ggplot(aes(x=Age, group=Survived, color=Survived)) + geom_freqpoly()
+```
+
 ## Question 18
+
+For both the graphs it shows that those not in the lower decks were more likely to survive. The proportion of people that died on the lowest deck it is quite large and as the deck levels increase (3 to 1) the percentage of people the survived also increases. Small children from the ages of approximately 0-5 were also likely to survive compared to people older than them.
