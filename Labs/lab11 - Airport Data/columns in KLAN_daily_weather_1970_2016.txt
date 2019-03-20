@@ -1,0 +1,44 @@
+Description: Weather observation data from https://www.ncdc.noaa.gov/cdo-web/ climate data online. Includes daily observations made at the Lansing Airport from January 1 1970 to December 31 2016.
+
+Format: data frame with the following columns
+
+STATION: the station where the weather observations were recorded
+DATE: the date of the weather observations
+PRCP: precipitation (inches)
+SNWD: snow depth (inches)
+SNOW: snowfall (inches)
+ACMH: Average cloudiness midnight to midnight from 30-second ceilometer data (percent)
+ACSH: Average cloudiness midnight to midnight from manual observations (percent)
+PSUN: Daily percent of possible sunshine (percent)
+TSUN: Daily total sunshine (minutes)
+TAVG: Average temperature (degrees F)
+TMAX: Maximum temperature (degrees F)
+TMIN: Minimum temperature (degrees F)
+AWND: Average daily wind speed (miles per hour)
+WSFG: Peak gust wind speed (miles per hour)
+WT09: blowing or drifting snow (1 or 0)
+WT14: drizzle
+WT07: Dust, volcanic ash, blowing dust, blowing sand, or blowing obstruction
+WT01: Fog, ice fog, or freezing fog (may include heavy fog)
+WT15: Freezing drizzle
+WT17: Freezing rain
+WT06: Glaze or rime
+WT21: Ground fog
+WT05: Hail (may include small hail)
+WT02: Heavy fog or heaving freezing fog (not always distinquished from fog)
+WT11: High or damaging winds
+WT22: Ice fog or freezing fog
+WT04: Ice pellets, sleet, snow pellets, or small hail 
+WT13: Mist
+WT16: Rain (may include freezing rain, drizzle, and freezing drizzle)
+WT08: Smoke or haze
+WT18: Snow, snow pellets, snow grains, or ice crystals
+WT03: Thunder
+WT10: Tornado, waterspout, or funnel cloud
+WT19: Unknown source of precipitation
+weekday: the day of the week, 3-letter abbreviation
+month: just the month, 3-letter abbreviation
+day: an integer representing day of the month
+year: just the year
+week: an integer representing the week of the year
+season: winter, spring, summer, fall

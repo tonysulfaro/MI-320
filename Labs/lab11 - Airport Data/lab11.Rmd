@@ -1,0 +1,95 @@
+---
+title: "Lab11 - Airport Data Analysis, Weather Observations"
+author: "tony sulfaro"
+date: "3/20/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+## Question 01
+```{r}
+klan_daily = read_csv("KLAN_daily_weather_1970_2016.csv")
+```
+
+## Question 02
+
+Variable WT16 is data that looks like logical data (boolean, TRUE/FALSE). After consulting the documentation file the variable indicates the presence of rain at that time. Meaning Rain, freezing rain, drizzle, freezing drizzle.
+
+Here is what some of the data look like.
+
+```{r}
+head(klan_daily$WT16)
+```
+
+## Question 03
+
+The dataset consists of `r ncol(klan_daily)` variables (columns) and `r nrow(klan_daily)` entries (rows) within the klan_daily dataset.
+
+## Question 04
+
+```{r}
+klan_daily %>% filter(season == "winter") %>% arrange(desc(TMAX))
+```
+
+## Question 05
+
+```{r}
+klan_daily$above_freezing = (klan_daily$TMAX>32)
+```
+
+## Question 06
+
+```{r}
+klan_daily %>% filter(above_freezing==FALSE) %>% group_by(year) %>% summarise(below_freezing_count = n()) %>% arrange(desc(below_freezing_count))
+```
+
+## Question 07
+
+```{r}
+klan_daily %>% group_by(year) %>% summarise(precipitation = sum(PRCP)) %>% arrange(desc(precipitation))
+```
+
+## Question 08
+
+```{r}
+klan_daily %>% group_by(year, month) %>% 
+  summarise(most_sunshine = sum(TSUN), average_sunshine = mean(TSUN, na.rm = TRUE), percent_sun = mean(PSUN, na.rm = TRUE)) %>%
+  arrange(desc(most_sunshine))
+```
+
+## Question 09
+
+The daily percent of possible sunshine (PSUN) imo was the least useful to me because at the time it was a prediction of how much sun but we already have how much sun there actually was (TSUN) because those days already happened. It would be useful to compare predictions with results but for our use case it is not as useful when seeing how much sun was actually had.
+
+## Question 10
+
+```{r}
+klan_daily %>% 
+  group_by(month) %>% 
+  summarise(avg_sun = mean(TSUN, na.rm = TRUE)) %>%
+  ggplot(aes(x=month)) + geom_bar(aes(fill = avg_sun))
+```
+
+## Question 11
+
+```{r}
+klan_daily %>%
+  filter(season=="summer" & year >= 2001 & year <= 2016)
+```
+
+## Question 12
+
+## Question 13
+
+## Question 14
+
+## Question 15
+
+# Extra Credit
+
+## Step 01
+
+## Step 02
