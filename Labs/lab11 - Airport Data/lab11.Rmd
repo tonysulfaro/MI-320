@@ -70,23 +70,58 @@ The daily percent of possible sunshine (PSUN) imo was the least useful to me bec
 klan_daily %>% 
   group_by(month) %>% 
   summarise(avg_sun = mean(TSUN, na.rm = TRUE)) %>%
-  ggplot(aes(x=month)) + geom_bar(aes(fill = avg_sun))
+  ggplot(aes(x=month, y =avg_sun)) + geom_bar(aes(fill = avg_sun),stat = "identity")
 ```
 
 ## Question 11
 
 ```{r}
 klan_daily %>%
-  filter(season=="summer" & year >= 2001 & year <= 2016)
+  filter(season=="summer" & year >= 2001 & year <= 2016) %>% 
+  group_by(year) %>%
+  ggplot(aes(x=year, y=PRCP)) + geom_bar(stat = "identity")
 ```
 
 ## Question 12
 
+```{r}
+library(lubridate)
+today()
+now()
+```
+
 ## Question 13
+
+Create date-time objects from
+
+* "2017-02-22"
+* "February	2nd, 2017"
+* "02/21/2017	20:22:49"
+* 20170218
+* 02182017
+
+```{r}
+ymd("2017-02-22")
+mdy("February	2nd, 2017")
+mdy_hms("02/21/2017	20:22:49")
+ymd(20170218)
+mdy(02182017)
+```
 
 ## Question 14
 
+```{r}
+klan_daily$year = year(klan_daily$DATE)
+klan_daily$month = month(klan_daily$DATE, label = TRUE, abbr = FALSE)
+klan_daily$week = week(klan_daily$DATE)
+klan_daily$day_of_week = wday(klan_daily$DATE, label = TRUE, abbr = FALSE)
+klan_daily$day_of_month = mday(klan_daily$DATE)
+klan_daily
+```
+
 ## Question 15
+
+To find out if my results were correct I could look at specific dates on the calendar and compare to the timestamp to make sure everything lines up.
 
 # Extra Credit
 
