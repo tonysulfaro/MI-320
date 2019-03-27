@@ -1,0 +1,129 @@
+---
+title: "lab12 - ggplot and R markdown"
+author: "tony sulfaro"
+date: "3/27/2019"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+# Question 01
+To me, a scatterplot is a plot of data where data is constrained by an x and a y value (for example: population and gdp of countries) and a dot is placed where the x and y values intersect.
+
+# Question 02
+Heatmaps are like scatterplots where x and y values are used to plot data but a heat map uses concentrations of values rather than individual points by overlapping points.
+
+# Question 03
+A bubble chart is like a scatterplot and data is arranged basically the same way but there is a third variable that is represented by the size of the dot. An example would be x = population, y = gdp, and the size = life expectancy.
+
+# Question 04
+From what I could gather about faceted graphs, rather than plotting categorical variables together on the same x,y plane, they are broken up into completely seperate graphs to isolate each one.
+
+# Question 05
+```{r}
+crime_data = read_csv("crimeRatesByState2005.csv")
+crime_data %>%
+  ggplot(aes(x=murder, y=burglary)) + geom_point()
+```
+
+# Question 06
+```{r}
+crime_data %>%
+  filter(state != "District of Columbia" & state != "United States") %>%
+  ggplot(aes(x=murder, y=burglary)) + geom_point()
+```
+
+The relationship shown in this plot is that the more murders there are, the more burglaries on average there are. This could be because areas of high crime rates have high numbers of both burglaries, murders, as well as other crimes.
+
+# Question 07
+```{r}
+crime_data %>%
+  filter(state != "District of Columbia" & state != "United States") %>%
+  ggplot(aes(x=murder, y=burglary)) + geom_point()+
+  ggtitle("Murder vs Burglary rates within the united states by state") +
+  labs(caption="There is a positive correlation between rates of burglaries and murders.")+
+  xlab("Murder rate per capita") +
+  ylab("Burglary rate per capita")
+```
+
+
+# Question 08
+```{r}
+crime_data %>%
+  filter(state != "District of Columbia" & state != "United States") %>%
+  ggplot(aes(x=murder, y=burglary)) + geom_point() + geom_smooth() +
+  ggtitle("Murder vs Burglary rates within the united states by state") +
+  labs(caption="There is a positive correlation between rates of burglaries and murders.")+
+  xlab("Murder rate per capita") +
+  ylab("Burglary rate per capita")
+```
+
+# Question 09
+```{r}
+crime_data %>%
+  filter(state != "District of Columbia" & state != "United States") %>%
+  ggplot(aes(x=aggravated_assault, y=motor_vehicle_theft)) + geom_point() + geom_smooth() +
+  ggtitle("aggravated assault vs motor vehicle theft rates within the united states by state") +
+  labs(caption="There is a indeterminate correlation between rates of assault and vehicle theft")+
+  xlab("Aggravated assault per capita") +
+  ylab("Motor vehicle theft per capita")
+```
+
+# Question 10
+```{r}
+crime_data %>%
+  filter(state != "District of Columbia" & state != "United States") %>%
+  ggplot(aes(x=murder, y=burglary, size=population)) + geom_point() + geom_smooth() +
+  ggtitle("Murder vs Burglary rates within the united states by state") +
+  labs(caption="There is a positive correlation between rates of burglaries and murders.")+
+  xlab("Murder rate per capita") +
+  ylab("Burglary rate per capita")
+```
+
+# Question 11
+After adding the population variable as the size of the bubbles in the scatterplot. It would appear that states with more population have a higher tendancy of crime.
+
+# Question 12
+```{r}
+library(GGally)
+crime_data %>%
+  filter(state != "District of Columbia" & state != "United States") %>%
+  select(murder, forcible_rape, robbery, aggravated_assault, burglary, larceny_theft, motor_vehicle_theft, population) %>%
+  ggpairs()
+```
+
+
+# Question 13
+Two variables with a strong correlaction from the scatterplot matrix were robbery and murder. There was a positive correlation between the two and had a correlation value of 0.755.
+
+# Question 14
+```{r}
+crime_data %>%
+  filter(state != "District of Columbia" & state != "United States") %>%
+  ggplot(aes(x=murder, y=burglary)) + geom_point()+
+  facet_wrap(~region)
+```
+
+# Question 15
+There are some differences in the relationship between murder and burglary when grouping by regions of the United States. The south has high rates of burglary and murder, the west has average amounts of murder and burglary compared to the rest of the US, The midwest has average amounts of burglary and murder, and the Northeast has average amounts of murder but lower burglary levels.
+
+# Extra Credit
+
+# Problem 01
+```{r}
+crime_data %>%
+  filter(state != "District of Columbia" & state != "United States") %>%
+  ggplot(aes(x=murder, y=burglary, size=population, colour=region)) + geom_point() + geom_smooth() +
+  ggtitle("Murder vs Burglary rates within the united states by state") +
+  labs(caption="There is a positive correlation between rates of burglaries and murders.")+
+  xlab("Murder rate per capita") +
+  ylab("Burglary rate per capita")
+```
+
+# Problem 02
+
+
+
