@@ -54,7 +54,7 @@ crime_data %>%
 ```{r}
 crime_data %>%
   filter(state != "District of Columbia" & state != "United States") %>%
-  ggplot(aes(x=murder, y=burglary)) + geom_point() + geom_smooth() +
+  ggplot(aes(x=murder, y=burglary)) + geom_point() + geom_smooth(method = "lm") +
   ggtitle("Murder vs Burglary rates within the united states by state") +
   labs(caption="There is a positive correlation between rates of burglaries and murders.")+
   xlab("Murder rate per capita") +
@@ -65,9 +65,9 @@ crime_data %>%
 ```{r}
 crime_data %>%
   filter(state != "District of Columbia" & state != "United States") %>%
-  ggplot(aes(x=aggravated_assault, y=motor_vehicle_theft)) + geom_point() + geom_smooth() +
+  ggplot(aes(x=aggravated_assault, y=motor_vehicle_theft)) + geom_point() + geom_smooth(method = "lm") +
   ggtitle("aggravated assault vs motor vehicle theft rates within the united states by state") +
-  labs(caption="There is a indeterminate correlation between rates of assault and vehicle theft")+
+  labs(caption="There is a positive correlation between rates of assault and vehicle theft")+
   xlab("Aggravated assault per capita") +
   ylab("Motor vehicle theft per capita")
 ```
@@ -76,7 +76,9 @@ crime_data %>%
 ```{r}
 crime_data %>%
   filter(state != "District of Columbia" & state != "United States") %>%
-  ggplot(aes(x=murder, y=burglary, size=population)) + geom_point() + geom_smooth() +
+  ggplot(aes(x=murder, y=burglary, size=population)) + geom_point() + 
+  scale_size_area(max_size = 10) +
+  geom_smooth(method = "lm") +
   ggtitle("Murder vs Burglary rates within the united states by state") +
   labs(caption="There is a positive correlation between rates of burglaries and murders.")+
   xlab("Murder rate per capita") +
@@ -84,7 +86,7 @@ crime_data %>%
 ```
 
 # Question 11
-After adding the population variable as the size of the bubbles in the scatterplot. It would appear that states with more population have a higher tendancy of crime.
+After adding the population variable as the size of the bubbles in the scatterplot. It would appear that states with more population have a higher tendancy of crime compared to areas with smaller populations.
 
 # Question 12
 ```{r}
@@ -97,7 +99,7 @@ crime_data %>%
 
 
 # Question 13
-Two variables with a strong correlaction from the scatterplot matrix were robbery and murder. There was a positive correlation between the two and had a correlation value of 0.755.
+Two variables with a strong correlaction from the scatterplot matrix were robbery and murder. There was a positive correlation between the two just by looking at it and by looking at the correlation value of 0.755.
 
 # Question 14
 ```{r}
@@ -116,7 +118,8 @@ There are some differences in the relationship between murder and burglary when 
 ```{r}
 crime_data %>%
   filter(state != "District of Columbia" & state != "United States") %>%
-  ggplot(aes(x=murder, y=burglary, size=population, colour=region)) + geom_point() + geom_smooth() +
+  ggplot(aes(x=murder, y=burglary, size=population, colour=region)) + geom_point() + 
+  scale_size_area(max_size = 10) + geom_smooth(method="lm") +
   ggtitle("Murder vs Burglary rates within the united states by state") +
   labs(caption="There is a positive correlation between rates of burglaries and murders.")+
   xlab("Murder rate per capita") +
