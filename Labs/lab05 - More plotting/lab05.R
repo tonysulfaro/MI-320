@@ -86,7 +86,7 @@ ggplot(data = election2016) +
   geom_point(mapping = aes(x=pct_pop_metro, y=d_points, colour = factor(d_points > 0), size=3))+
   scale_color_manual(values = c("red", "blue"))+
   ggtitle("Votes for Clinton by percentage of population in metro areas") +
-  labs(caption="States with a more metrolpolitan population tend to lean more to the left")+
+   o
   xlab("State Percentage in Metro Area") +
   ylab("Vote Point Percentages towards Clinton")+
   geom_hline(aes(yintercept=0), colour="#838B8B")+

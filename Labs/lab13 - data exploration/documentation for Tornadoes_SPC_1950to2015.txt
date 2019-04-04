@@ -1,0 +1,77 @@
+Description: 
+
+Dataset about historical tornado activity in the United States from 1950 to 2015. The National Weather Service uses historical weather observations like these to understand different weather phenomena and help make better predictions about future severe weather events. This is especially important for deadly weather events like tornadoes.
+
+The data originally came from the National Weather Service Storm Prediction Center, at http://www.spc.noaa.gov/wcm/#data
+
+
+Format:
+
+60,114 rows × 22 columns
+
+om: A count of tornadoes during the specified year, as of the date indicated in the row. Prior to 2007, these numbers were assigned to the tornado as the information arrived in the NWS database. Since 2007, the numbers may have been assigned in sequential (temporal) order after event date/times are converted to CST. However, do not use "om" to count the sequence of tornadoes through the year as sometimes new entries have come in late, or corrections are made, and the dates are not re-sequenced.
+
+yr: Year that a tornado occurred
+
+mo: Month that a tornado occurred
+
+dy: Day that a tornado occurred
+
+date: Date that a tornado occurred
+
+time: Time that a tornado occurred
+
+tz: Time zone. All times, except for ?=unknown and 9=GMT were converted to 3=CST.
+
+st: State. Two letter postal abbreviation (PR = Puerto Rico, VI = Virgin Islands)
+
+stf: State FIPS number. The FIPS county code is a five-digit Federal Information Processing Standards (FIPS) code (FIPS 6-4) which uniquely identifies counties and county equivalents in the United States, certain U.S. possessions, and certain freely associated states. Note some Puerto Rico codes are incorrect.
+
+stn: Number of this tornado, in this state, in this year. May not be sequential in some years. Note: discontinued in 2008. This number can be calculated in a spreadsheet by sorting and after accounting for border crossing tornadoes and 4+ county segments.
+
+mag: F-scale (EF-scale after Jan. 2007). Values -9 (unknown/missing data), 0, 1, 2, 3, 4, 5. The Fujita scale (F-Scale), or Fujita–Pearson scale (FPP scale), is a scale for rating tornado intensity, based primarily on the damage tornadoes inflict on human-built structures and vegetation.
+
+inj: Injuries. When summing for state totals use sn=1, not sg=1 (see below)
+
+fat: Fatalities. When summing for state totals use sn=1, not sg=1 (see below)
+
+loss: Estimated property loss information. Prior to 1996 this is a categorization of tornado damage by dollar amount. Each category is an order of magnitude larger than the previous category. 0 for blank/unknown; 1<$50; 2=$50-$500; 3=$500-5,000; 4=$5,000-50,000; 5=$50,000-$500,000; 6=$500,000-$5,000,000; 7=$5,000,000-$50,000,000; 8=$50,000,000-$500,000,000; 9=$5,000,000,000. From 1996, this is tornado property damage in millions of dollars. Note: this may change to whole dollar amounts in the future. Entry of 0 does not mean $0.
+
+closs: Estimated crop loss in millions of dollars (started in 2007). Entry of 0 does not mean $0.
+
+slat: Starting latitude in decimal degrees
+
+slon: Starting longitude in decimal degres
+
+elat: Ending latitude in decimal degrees
+
+elon: Ending longitude in decimal degrees
+
+len: Length in miles
+
+wid: Width in yards
+
+fc: 0 for unaltered (E)F-scale rating. fc=1 if previous rating was -9 (unknown)
+
+
+Details: 
+
+It should also be noted that these data are used by the NWS for verification purposes and may not accurately reflect all storm events. Monetary loss information is highly suspect and should be used with caution, if at all.
+
+This file contains data that has been submitted to the Storm Data publication by National Weather Service field offices. Careful review of the data is conducted at the National Climate Data Center and the Storm Prediction Center. Nonetheless, some errors/discrepancies may exist.
+
+Between 1953 and 1982, 1,864 CONUS tornadoes were coded in the official database with an F-scale rating of -9. The missing F-scale information was coded based on estimates of the cost of property loss for these tornadoes. This resulted in the following breakdown of tornadoes ranked by estimated F-scale (percent of total F=-9 records is shown):
+
+F0: 1038 tornadoes (55.5%)
+F1: 742 tornadoes (40.1%)
+F2: 26 tornadoes (1.3%)
+F3: 52 tornadoes (2.7%)
+F4: 6 tornadoes (0.3%)
+F5: None
+
+
+Source:
+
+The data file is from the data sharing website kaggle.com, and comes from here: https://www.kaggle.com/jtennis/spctornado/version/3
+
+The documentation information comes from here: http://www.spc.noaa.gov/wcm/data/SPC_severe_database_description.pdf

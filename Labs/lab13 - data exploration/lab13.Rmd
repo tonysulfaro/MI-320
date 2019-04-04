@@ -1,0 +1,133 @@
+---
+title: "Lab13 - Exploring Tornado Data"
+author: "tony sulfaro"
+date: "4/3/2019"
+output: html_document
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(dplyr)
+tornadoes_data <-read_csv("Tornadoes_SPC_1950to2015.csv", col_types=cols(loss=col_double(), closs=col_double(),date=col_date("%m/%d/%Y"),mag=col_character(),stf=col_character()))
+```
+
+# Question 01
+
+This dataset was collected by the National Weather Service Prediction Center from mulitple field offices throughout the United States. The data was collected to help track tornado damage and aid when making predictions about future weather events.
+
+# Question 02
+
+The dataset comes from a website [Kaggle](https://www.kaggle.com). Here is a [link](https://www.kaggle.com/jtennis/spctornado/version/3) to the dataset and [another link](http://www.spc.noaa.gov/wcm/data/SPC_severe_database_description.pdf) to the documentation.
+
+# Question 03
+
+There are `r nrow(tornadoes_data)` entries in the tornado dataset and `r ncol(tornadoes_data)` variables in the dataset.
+
+# Question 04
+
+Several variables from the dataset include:
+
+* year - numeric -> interval
+* month - numeric -> interval
+* st - categorial -> nominal
+* mag - numeric -> interval
+* inj - numeric -> ratio:discrete
+* fat - numeric -> ratio:discrete
+* len - numeric -> ratio:continuous
+* wid - numeric -> ratio:continuous
+
+# Question 05
+
+Because the dataset was contributed to by many people over time there are going to be NULL values. When looking at the variable elat (ending latitude) one can see how there are not entries for this variable because they were not recorded
+
+# Question 06
+
+```{r}
+tornadoes_data %>%
+  ggplot(aes(x=mag)) + geom_bar()
+```
+
+The most common magnitude of tornado is magnitude 0. The least common magnitude is 5. You can tell beacuse 0 is the tallest bar in the bar chart and 5 is the smallest.
+
+# Question 07
+
+```{r}
+tornadoes_data %>%
+  ggplot(aes(x=len)) + geom_histogram()
+```
+
+Without setting the binwidth the bars look very tiny. This is because the length of tornadoes in the dataset is a double so there are many values for the bars on the x-axis. By putting them in bins its easier to see approximately how long tornadoes go.
+
+# Question 08
+
+```{r}
+tornadoes_data %>%
+  filter(len >0 & len < 10) %>%
+  ggplot(aes(x=len)) + geom_histogram(binwidth = 1)
+```
+After generating the graph, most tornadoes are between 0 and 1 miles in length.
+
+# Question 09
+
+```{r}
+tornadoes_data %>%
+  count(mo, yr) %>%
+  ggplot(mapping = aes(x = mo, y = yr)) +
+  geom_tile(mapping = aes(fill = n))
+```
+April - June have the highest amounts of tornadoes. By looking at the heatmap one can see that the shading is similar throughout years. It is a lighter shade in the months April-June for all years.
+
+# Question 10
+
+```{r}
+tornadoes_data %>%
+  ggplot(aes(x=mag, y=len)) +
+  geom_boxplot() +
+  coord_flip()
+```
+After looking at the box plots generated one can see that the higher the magnitude of tornado, the further it travels on average.
+
+# Question 11
+
+```{r}
+tornadoes_data %>%
+  ggplot(mapping = aes(x=inj, y=fat)) +
+  geom_point()
+```
+
+There appears to be a postitive relationship between the number of fatalities and number of injuries per tornado entry in the dataset. This makes sense because tornadoes that cause alot of damage tend to cause both high levels of injuries and also high levels of fatalities.
+
+# Question 12
+
+```{r}
+tornadoes_data %>%
+  filter(yr >= 2005 & yr <= 2015) %>%
+  filter(st == "KS" | st == "OK" | st == "LA"| st == "TX") %>%
+  ggplot(mapping = aes(x=st,y=yr))+geom_count()
+```
+
+# Question 13
+
+```{r}
+tornadoes_data %>%
+  filter(yr >= 2005 & yr <= 2015) %>%
+  filter(st == "KS" | st == "OK" | st == "LA"| st == "TX") %>%
+  group_by(st,yr) %>% summarise(count = n()) %>%
+  ggplot(aes(x=yr,y=count,fill=st))+
+  geom_bar(stat = "identity",position="dodge")
+```
+
+# Question 14
+
+```{r}
+tornadoes_data %>%
+  filter(yr >= 2005 & yr <= 2015) %>%
+  filter(st == "KS" | st == "OK" | st == "LA"| st == "TX") %>%
+  count(st, yr) %>%
+  ggplot(mapping = aes(x = st, y = yr)) +
+  geom_tile(mapping = aes(fill = n))
+```
+
+# Question 15
+
+
