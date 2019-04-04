@@ -65,6 +65,7 @@ tornadoes_data %>%
   filter(len >0 & len < 10) %>%
   ggplot(aes(x=len)) + geom_histogram(binwidth = 1)
 ```
+
 After generating the graph, most tornadoes are between 0 and 1 miles in length.
 
 # Question 09
@@ -130,4 +131,4 @@ tornadoes_data %>%
 
 # Question 15
 
-
+After looking at each of the generated graphs the one that utilized geom_count() is the least useful to me because it is hard to quantify sizes of circles compared to one another. The one that I like the most is the one from Question 14 that utilized geom_tile(). I like this visualization the most because it is easy to look at which states in a given year have a higher proportion of tornadoes than the others. Question 13 that uses geom_bar() is a close second but because there are so many years the graph ends up looking busy and hard to digest.
