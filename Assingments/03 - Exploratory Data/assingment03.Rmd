@@ -1,0 +1,28 @@
+---
+title: "Assingment 03"
+author: "tony sulfaro"
+date: "4/5/2019"
+output: html_document
+---
+
+# Setup
+```{r, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(fivethirtyeight)
+```
+
+# Activity 01
+
+Let's take a look at the dataset documentation using ?comic_characters from the library fivethirtyeight.
+
+We can see that 
+
+# Activity 02
+
+# Activity 03
+
+# Activity 04
+
+# Activity 05
+

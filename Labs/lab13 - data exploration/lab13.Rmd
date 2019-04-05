@@ -132,3 +132,22 @@ tornadoes_data %>%
 # Question 15
 
 After looking at each of the generated graphs the one that utilized geom_count() is the least useful to me because it is hard to quantify sizes of circles compared to one another. The one that I like the most is the one from Question 14 that utilized geom_tile(). I like this visualization the most because it is easy to look at which states in a given year have a higher proportion of tornadoes than the others. Question 13 that uses geom_bar() is a close second but because there are so many years the graph ends up looking busy and hard to digest.
+
+
+# Extra Credit
+
+# Step 01
+
+It looks funny because it goes from 0 to 12.5. This is because it picked a range for the axis using some calculation to space out x-labels. We want 1-12 however because thats how many months there are in a year. We can change the x-label to an auto incrementing range from 1-12 instead to solve this issue.
+
+# Step 02
+
+Use an incrementing range for x-axis from 1-12 with increments of 1 for each value.
+
+```{r}
+tornadoes_data %>%
+  count(mo, yr) %>%
+  ggplot(mapping = aes(x = mo, y = yr)) +
+  geom_tile(mapping = aes(fill = n)) + 
+  scale_x_continuous(breaks=seq(1, 12, 1))
+```
