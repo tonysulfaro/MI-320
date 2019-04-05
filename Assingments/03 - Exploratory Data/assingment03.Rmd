@@ -16,11 +16,84 @@ library(fivethirtyeight)
 
 Let's take a look at the dataset documentation using ?comic_characters from the library fivethirtyeight.
 
-We can see that 
+We can see that the data originally came from a study conducted by 538 that examined comic books from DC and Marvel from ~1939 until 2014 (August 24th) by gender / publisher.
+
+Some quick dataset dimensions: The dataset has `r nrow(comic_characters)` rows and `r ncol(comic_characters)` columns (variables).
+
+A single row or entry in the dataset contains a character and various attributes associated with them like their first appearance, if they are alive or not, what their eye and hair color is, and their gender.
+
+Here is a list of all the variables for each row in the dataset:
+
+* publisher: Comic publisher
+* page_id: Qnique ID for that characters page within the wikia
+* name: Name of the character
+* urlslug: url that takes you to the character page
+* id: Identity status of the character (secret or public identity, Marvel only) (Eg: Spiderman is secret)
+* align: If character is Good, Bad, or Neutral
+* eye: Eye color of the character
+* hair: Hair color
+* sex: Sex of the character (male, female, etc)
+* gsm: If the character is a gender or sexual minority (homosexual or bisexual)
+* alive: Alive or deceased
+* appearances: Number of times they appear in comic books. (as of Sep. 2, 2014)
+* first_appearance: First month and year character appeared in a comic book
+* month: month of characters first appearance, if availible
+* year: year of characters first appearance, if availible
+* date: date of characters first appearance, if availible
 
 # Activity 02
 
+Here is a list of some categorial variables in the dataset:
+
+* publisher: Comic publisher
+* name: Name of the character
+* id: Identity status of the character (secret or public identity, Marvel only) (Eg: Spiderman is secret)
+* align: If character is Good, Bad, or Neutral
+* eye: Eye color of the character
+* hair: Hair color
+* sex: Sex of the character (male, female, etc)
+* gsm: If the character is a gender or sexual minority (homosexual or bisexual)
+* alive: Alive or deceased
+
+After looking at these variables and the non-categorical ones some questions that I could ask could include:
+
+* What is the proportion of each gender by comic book publisher?
+* What are the most common attributes for a good character or bad one?
+* Does the percentage of non-male characters increase over time?
+
 # Activity 03
+
+Let's generate some sweet visualizations to help us answer some questions! (Not those previous ones though, they were just sample questions to help me think about the data)
+
+## Question 01
+
+In	each	year	since	1961	and	for	both	publishers	combined,	what	percent	of	new	
+characters	are	male	versus	female?
+
+```{r}
+comic_characters %>%
+  filter(year >= 1961) %>%
+  group_by(year, sex) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x=year, y=count, color=sex)) + geom_line(stat = "identity",position="dodge")
+```
+
+
+## Question 02
+
+What	proportion	of	good	versus	bad	characters	from	each	publisher	are	male	versus	
+female,	since	1961?
+
+```{r}
+comic_characters %>%
+  filter(year >= 1961) %>%
+  count(year, sex) %>%
+  ggplot(mapping = aes(x = year, y = sex)) +
+  geom_tile(mapping = aes(fill = n))
+```
+
+## Question 03
+
 
 # Activity 04
 

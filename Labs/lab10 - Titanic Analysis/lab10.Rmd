@@ -219,7 +219,8 @@ titanic %>% mutate(Survived = (Survived==1)) %>%
 It looks like people on the lowest deck (3rd) had a higher percentage of deaths than all other classes. Lets calculate the actual percentages.
 
 ```{r}
-titanic %>% group_by(Class =Pclass) %>% summarise(Passenger_Count = n(), Survived_Count = nrow(subset(titanic,Survived==1 & Pclass==Class)), Perished_Count = nrow(subset(titanic,Survived==0 & Pclass==Class)), Survival_Percentage = 100*(Survived_Count/Passenger_Count))
+titanic %>% group_by(Class =Pclass) %>% 
+summarise(Passenger_Count = n(), Survived_Count = nrow(subset(titanic,Survived==1 & Pclass==Class)), Perished_Count = nrow(subset(titanic,Survived==0 & Pclass==Class)), Survival_Percentage = 100*(Survived_Count/Passenger_Count))
 ```
 
 Yes, the lower deck (class 3) has the lowest percentage of people that survived.

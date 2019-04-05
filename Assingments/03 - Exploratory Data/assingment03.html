@@ -196,13 +196,102 @@ $(document).ready(function () {
 </div>
 <div id="activity-01" class="section level1">
 <h1>Activity 01</h1>
-<p>Let’s take a look at the dataset using /Library/Frameworks/R.framework/Versions/3.5/Resources/library/fivethirtyeight/help/comic_characters</p>
+<p>Let’s take a look at the dataset documentation using ?comic_characters from the library fivethirtyeight.</p>
+<p>We can see that the data originally came from a study conducted by 538 that examined comic books from DC and Marvel from ~1939 until 2014 (August 24th) by gender / publisher.</p>
+<p>Some quick dataset dimensions: The dataset has 23272 rows and 16 columns (variables).</p>
+<p>A single row or entry in the dataset contains a character and various attributes associated with them like their first appearance, if they are alive or not, what their eye and hair color is, and their gender.</p>
+<p>Here is a list of all the variables for each row in the dataset:</p>
+<ul>
+<li>publisher: Comic publisher</li>
+<li>page_id: Qnique ID for that characters page within the wikia</li>
+<li>name: Name of the character</li>
+<li>urlslug: url that takes you to the character page</li>
+<li>id: Identity status of the character (secret or public identity, Marvel only) (Eg: Spiderman is secret)</li>
+<li>align: If character is Good, Bad, or Neutral</li>
+<li>eye: Eye color of the character</li>
+<li>hair: Hair color</li>
+<li>sex: Sex of the character (male, female, etc)</li>
+<li>gsm: If the character is a gender or sexual minority (homosexual or bisexual)</li>
+<li>alive: Alive or deceased</li>
+<li>appearances: Number of times they appear in comic books. (as of Sep. 2, 2014)</li>
+<li>first_appearance: First month and year character appeared in a comic book</li>
+<li>month: month of characters first appearance, if availible</li>
+<li>year: year of characters first appearance, if availible</li>
+<li>date: date of characters first appearance, if availible</li>
+</ul>
 </div>
 <div id="activity-02" class="section level1">
 <h1>Activity 02</h1>
+<p>Here is a list of some categorial variables in the dataset:</p>
+<ul>
+<li>publisher: Comic publisher</li>
+<li>name: Name of the character</li>
+<li>id: Identity status of the character (secret or public identity, Marvel only) (Eg: Spiderman is secret)</li>
+<li>align: If character is Good, Bad, or Neutral</li>
+<li>eye: Eye color of the character</li>
+<li>hair: Hair color</li>
+<li>sex: Sex of the character (male, female, etc)</li>
+<li>gsm: If the character is a gender or sexual minority (homosexual or bisexual)</li>
+<li>alive: Alive or deceased</li>
+</ul>
+<p>After looking at these variables and the non-categorical ones some questions that I could ask could include:</p>
+<ul>
+<li>What is the proportion of each gender by comic book publisher?</li>
+<li>What are the most common attributes for a good character or bad one?</li>
+<li>Does the percentage of non-male characters increase over time?</li>
+</ul>
 </div>
 <div id="activity-03" class="section level1">
 <h1>Activity 03</h1>
+<p>Let’s generate some sweet visualizations to help us answer some questions! (Not those previous ones though, they were just sample questions to help me think about the data)</p>
+<div id="question-01" class="section level2">
+<h2>Question 01</h2>
+<p>In each year since 1961 and for both publishers combined, what percent of new characters are male versus female?</p>
+<pre class="r"><code>comic_characters %&gt;%
+  filter(year &gt;= 1961) %&gt;%
+  group_by(year) %&gt;% summarise(count = n(), male_count = nrow(subset(comic_characters, sex=&quot;Male&quot;)), female_count = nrow(subset(comic_characters, sex=&quot;Female&quot;)), male_percentage = male_count/count, female_percentage = female_count/count)</code></pre>
+<pre><code>## # A tibble: 53 x 6
+##     year count male_count female_count male_percentage female_percentage
+##    &lt;int&gt; &lt;int&gt;      &lt;int&gt;        &lt;int&gt;           &lt;dbl&gt;             &lt;dbl&gt;
+##  1  1961   134      23272        23272            174.              174.
+##  2  1962   147      23272        23272            158.              158.
+##  3  1963   223      23272        23272            104.              104.
+##  4  1964   205      23272        23272            114.              114.
+##  5  1965   230      23272        23272            101.              101.
+##  6  1966   201      23272        23272            116.              116.
+##  7  1967   180      23272        23272            129.              129.
+##  8  1968   203      23272        23272            115.              115.
+##  9  1969   157      23272        23272            148.              148.
+## 10  1970   160      23272        23272            145.              145.
+## # … with 43 more rows</code></pre>
+</div>
+<div id="question-02" class="section level2">
+<h2>Question 02</h2>
+<p>What proportion of good versus bad characters from each publisher are male versus<br />
+female, since 1961?</p>
+<pre class="r"><code>comic_characters %&gt;%
+  filter(year &gt;= 1961) %&gt;%
+  group_by(year, align) %&gt;% 
+  summarise(count = n())</code></pre>
+<pre><code>## # A tibble: 162 x 3
+## # Groups:   year [?]
+##     year align           count
+##    &lt;int&gt; &lt;ord&gt;           &lt;int&gt;
+##  1  1961 Bad Characters     58
+##  2  1961 Good Characters    50
+##  3  1961 &lt;NA&gt;               26
+##  4  1962 Bad Characters     62
+##  5  1962 Good Characters    47
+##  6  1962 &lt;NA&gt;               38
+##  7  1963 Bad Characters     84
+##  8  1963 Good Characters    74
+##  9  1963 &lt;NA&gt;               65
+## 10  1964 Bad Characters    100
+## # … with 152 more rows</code></pre>
+</div>
+<div id="question-03" class="section level2">
+<h2>Question 03</h2>
+</div>
 </div>
 <div id="activity-04" class="section level1">
 <h1>Activity 04</h1>
