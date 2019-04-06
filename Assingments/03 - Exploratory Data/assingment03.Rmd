@@ -73,31 +73,34 @@ characters	are	male	versus	female?
 ```{r}
 d = comic_characters %>%
   filter(year >= 1961) %>%
-  mutate(male_count = nrow(subset(comic_characters, sex="Male"))) %>% 
   group_by(year, sex) %>%
   summarise(count = n()) %>%
   mutate(proportion = count / sum(count),
          percent = proportion * 100)
 
-  ggplot(d, aes(x=year, y=percent, color=sex)) + 
-    geom_line(stat = "identity",position="dodge") +
-    labs(x = "Year", 
-      y="Relative Percentage of Genders", 
-      title="Female Comic Book Characters are on the Rise")
+ggplot(d, aes(x=year, y=percent, color=sex)) + 
+  geom_line(stat = "identity",position="dodge") +
+  labs(x = "Year", 
+    y="Relative Percentage of Genders", 
+    title="Female Comic Book Characters are on the Rise")
 ```
 
 
 #### Question 02
 
-What	proportion	of	good	versus	bad	characters	from	each	publisher	are	male	versus	
+What	proportion	of	good	versus	bad	characters	from	each	publisher	are	male versus	
 female,	since	1961?
 
 ```{r}
-comic_characters %>%
-  filter(year >= 1961) %>%
-  group_by(publisher, align, sex) %>%
+e = comic_characters %>%
+  filter(year >= 1961 & (align == "Bad Characters" | align=="Good Characters") & (sex=="Male Characters" | sex=="Female Characters")) %>%
+  group_by(year, align, sex) %>%
   summarise(count = n()) %>%
-  ggplot(aes(x=align, y=count, color=sex)) + geom_line(stat = "identity",position="dodge")
+  mutate(proportion = count / sum(count),
+         percent = proportion * 100)
+
+ggplot(e, aes(x=year, y = percent, fill=sex)) + 
+  geom_bar(stat="identity")
 ```
 
 #### Question 03
@@ -115,6 +118,26 @@ comic_characters %>%
 ```
 
 # Activity 04 - Improved Graphs
+
+#### Improved Gender Graph
+
+```{r}
+d = comic_characters %>%
+  filter(year >= 1961 & (sex == "Male Characters" | sex == "Female Characters")) %>%
+  group_by(year, sex) %>%
+  summarise(count = n()) %>%
+  mutate(proportion = count / sum(count),
+         percent = proportion)
+
+ggplot(d, aes(x=year, y=percent, color=sex)) + 
+  geom_line(stat = "identity",position="dodge") +
+  labs(x = "Year", 
+    y="Relative Percentage of Genders", 
+    title="Female Comic Book Characters are on the Rise",
+    caption="Other genders omitted for this example") +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::percent_format())
+```
 
 # Activity 05 -  Report
 
