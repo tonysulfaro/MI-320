@@ -67,8 +67,7 @@ Let's generate some sweet visualizations to help us answer some questions! (Not 
 
 #### Question 01
 
-In	each	year	since	1961	and	for	both	publishers	combined,	what	percent	of	new	
-characters	are	male	versus	female?
+In	each	year	since	1961	and	for	both	publishers	combined, what percent	of	new	characters	are	male	versus	female?
 
 ```{r}
 d = comic_characters %>%
@@ -88,37 +87,38 @@ ggplot(d, aes(x=year, y=percent, color=sex)) +
 
 #### Question 02
 
-What	proportion	of	good	versus	bad	characters	from	each	publisher	are	male versus	
-female,	since	1961?
+What	proportion	of	good	versus	bad	characters	from	each publisher	are	male versus	female,	since	1961?
 
 ```{r}
 e = comic_characters %>%
   filter(year >= 1961 & (align == "Bad Characters" | align=="Good Characters") & (sex=="Male Characters" | sex=="Female Characters")) %>%
-  group_by(year, align, sex) %>%
+  group_by(publisher, year, align, sex) %>%
   summarise(count = n()) %>%
   mutate(proportion = count / sum(count),
          percent = proportion * 100)
 
-ggplot(e, aes(x=year, y = percent, fill=sex)) + 
-  geom_bar(stat="identity")
+ggplot(e, aes(x=year, y = percent, color=sex)) + 
+  geom_bar(stat="identity", position = "dodge") + facet_grid(publisher~align)
 ```
 
 #### Question 03
 
-In	each	comic	universe,	do	male	characters	or	female	characters,	on	average,	have	
-more	appearances	per	character,	just	looking	at	years	since	1961	and	characters	
-that	appear	in	comics	often (more	than	100	appearances)?
+In	each	comic	universe,	do	male	characters	or	female	characters,	on	average,	have more	appearances	per	character,	just	looking	at	years	since	1961	and	characters that	appear	in	comics	often (more	than	100	appearances)?
 
 ```{r}
 f = comic_characters %>% 
   filter(year >= 1961 & (sex=="Male Characters" | sex=="Female Characters") & appearances > 100) %>%
-  group_by(year, sex) %>% 
+  group_by(publisher, year, sex) %>% 
   summarise(count = n()) %>%
+  mutate(proportion = count / sum(count),
+         percent = proportion * 100) %>%
   arrange(desc(count))
 
-ggplot(f, aes(x=year, y = count, fill=sex)) + 
-  geom_bar(stat="identity", position = "dodge")
+ggplot(f, aes(x=year, y = percent, fill=sex)) + 
+  geom_bar(stat="identity") + facet_wrap(~publisher)
 ```
+
+I won't lie this looks pretty bad. Thankfully, I make some changes in the next section to make it actually readable
 
 # Activity 04 - Improved Graphs
 
@@ -142,5 +142,176 @@ ggplot(d, aes(x=year, y=percent, color=sex)) +
   scale_y_continuous(labels = scales::percent_format())
 ```
 
+#### Question 02
+
+What	proportion	of	good	versus	bad	characters	from	each	publisher	are	male versus	
+female,	since	1961?
+
+```{r}
+e = comic_characters %>%
+  filter(year >= 1961 & (align == "Bad Characters" | align=="Good Characters") & (sex=="Male Characters" | sex=="Female Characters")) %>%
+  group_by(publisher, year, align, sex) %>%
+  summarise(count = n()) %>%
+  mutate(proportion = count / sum(count),
+         percent = proportion * 100)
+
+ggplot(e, aes(x=year, y = percent, color=sex)) +
+  geom_smooth(method = "loess", span = 0.3, se = FALSE) + 
+  facet_grid(publisher ~ align) +
+  theme_minimal()
+```
+
+
+#### Question 03
+
+In	each	comic	universe,	do	male	characters	or	female	characters,	on	average,	have more	appearances	per	character,	just	looking	at	years	since	1961	and	characters that	appear	in	comics	often (more	than	100	appearances)?
+
+```{r}
+f = comic_characters %>% 
+  filter(year >= 1961 & (sex=="Male Characters" | sex=="Female Characters") & appearances > 100) %>%
+  group_by(publisher, year, sex) %>% 
+  summarise(count = n()) %>%
+  mutate(proportion = count / sum(count),
+         percent = proportion * 100) %>%
+  arrange(desc(count))
+
+ggplot(f, aes(x=year, y = percent, color=sex)) + 
+  geom_smooth(method = "loess", span = 0.3, se = FALSE) + 
+  facet_wrap(~publisher) +
+  theme_minimal()
+```
+
+Why did I use geom_smooth() instead of geom_line()? Because the values vary quite a bit and geom_line() looks like this:
+
+```{r}
+f = comic_characters %>% 
+  filter(year >= 1961 & (sex=="Male Characters" | sex=="Female Characters") & appearances > 100) %>%
+  group_by(publisher, year, sex) %>% 
+  summarise(count = n()) %>%
+  mutate(proportion = count / sum(count),
+         percent = proportion * 100) %>%
+  arrange(desc(count))
+
+ggplot(f, aes(x=year, y = percent, color=sex)) + 
+  geom_line() +
+  #geom_smooth(method = "loess", span = 0.3, se = FALSE) + 
+  facet_wrap(~publisher) +
+  theme_minimal()
+```
+
 # Activity 05 -  Report
+
+### Data Background
+
+Before working with the comic_characters dataset I wasnt exactly sure what kind of data would be in store. Of course there would be data about comic book characters but the entries in the dataset were something I couldn't predict at the time. The data were collected by an organization by the name of Five Thirty Eight who conducted a study about comic book characters from comics from the years between 1938 and 2014.
+
+Each entry in the dataset represents not individual comics like I would have thought but rather entries about each particular comic book character. Pretty much every single one. There are more comic book characters than I would have thought which was suprising to me.`r nrow(comic_characters)` entries in the dataset to be exact. Each entry in the dataset contained a character name, unique id to resolve on a wiki page, their first appearance, publisher, and some physical attributes outlined here.
+
+* publisher: Comic publisher
+* page_id: Qnique ID for that characters page within the wikia
+* name: Name of the character
+* urlslug: url that takes you to the character page
+* id: Identity status of the character (secret or public identity, Marvel only) (Eg: Spiderman is secret)
+* align: If character is Good, Bad, or Neutral
+* eye: Eye color of the character
+* hair: Hair color
+* sex: Sex of the character (male, female, etc)
+* gsm: If the character is a gender or sexual minority (homosexual or bisexual)
+* alive: Alive or deceased
+* appearances: Number of times they appear in comic books. (as of Sep. 2, 2014)
+* first_appearance: First month and year character appeared in a comic book
+* month: month of characters first appearance, if availible
+* year: year of characters first appearance, if availible
+* date: date of characters first appearance, if availible
+
+### Questions
+
+The data avaible made it possible to answer some questions about it and gain insight into some trends that cannot be seen simply by staring at `r nrow(comic_characters)` entries.
+
+Some questions posed about the data included:
+
+* In	each	year	since	1961	and	for	both	publishers	combined, what percent	of	new	characters	are	male	versus	female?
+* What	proportion	of	good	versus	bad	characters	from	each publisher	are	male versus	female,	since	1961?
+* In	each	comic	universe,	do	male	characters	or	female	characters,	on	average,	have more	appearances	per	character,	just	looking	at	years	since	1961	and	characters that	appear	in	comics	often (more	than	100	appearances)?
+
+These questions were particularly interesting because they required some critical thinking into not only how to generate graphs to answer the questions posed, but how to create graphs that are functional yet attractive to the eye. A simple x,y plot of counts of characters by year was not going to cut it this time so I leveraged the power of ggplot2 to create some visualizations to give the needed insight into the data.
+
+#### Question 01 - Gender Proportions in Comic Books
+
+To answer this question, it was possible to answer it using a simple x,y plot where the year is on the x-axis and two lines (male and female) are plotted on the y-axis using the proportion of comics for a given year as the value. By looking at the graph, one can see that the proportion of female comic characters has been increasing since 1961.
+
+```{r, echo=FALSE}
+d = comic_characters %>%
+  filter(year >= 1961 & (sex == "Male Characters" | sex == "Female Characters")) %>%
+  group_by(year, sex) %>%
+  summarise(count = n()) %>%
+  mutate(proportion = count / sum(count),
+         percent = proportion)
+
+ggplot(d, aes(x=year, y=percent, color=sex)) + 
+  geom_line(stat = "identity",position="dodge") +
+  labs(x = "Year", 
+    y="Relative Percentage of Genders", 
+    title="Female Comic Book Characters are on the Rise",
+    caption="Other genders omitted for this example") +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::percent_format())
+```
+
+
+#### Question 02 - Proportions of Good/Bad Characters by Publisher and Gender
+
+By taking a similar approach to the last question (graphing year and gender proportions) It was fairly straightforward to split them apart by publisher and alignment (good or bad) by utilising a facet_grid(). The facet grid gave a clearer view into the data for each combination of the variables publisher, sex, and align. 
+
+```{r, echo=FALSE}
+e = comic_characters %>%
+  filter(year >= 1961 & (align == "Bad Characters" | align=="Good Characters") & (sex=="Male Characters" | sex=="Female Characters")) %>%
+  group_by(publisher, year, align, sex) %>%
+  summarise(count = n()) %>%
+  mutate(proportion = count / sum(count),
+         percent = proportion * 100)
+
+ggplot(e, aes(x=year, y = percent, color=sex)) +
+  geom_smooth(method = "loess", span = 0.3, se = FALSE) + 
+  facet_grid(publisher ~ align) +
+  theme_minimal() +
+  labs(x = "Year", 
+    y="Relative Percentage", 
+    title="Proportions of Good and Bad Characters by Gender and Publisher",
+    caption="Other genders omitted for this example") 
+```
+
+We can still see the trend that more female characters overall (good and bad) are being included in comics published by DC and Marvel but with the granularity to see that female characters are more likely to be good characters compared to males when looking at the proportions of good vs bad characters.
+
+#### Question 03 - Character Appearance by Gender and Publisher
+
+This question is similar to the first in that it is asking about the proportion of female characters in comic books but this time it excludes characters that have less than 100 appearances in comic books.
+
+```{r, echo=FALSE}
+f = comic_characters %>% 
+  filter(year >= 1961 & (sex=="Male Characters" | sex=="Female Characters") & appearances > 100) %>%
+  group_by(publisher, year, sex) %>% 
+  summarise(count = n()) %>%
+  mutate(proportion = count / sum(count),
+         percent = proportion * 100) %>%
+  arrange(desc(count))
+
+ggplot(f, aes(x=year, y = percent, color=sex)) + 
+  geom_smooth(method = "loess", span = 0.3, se = FALSE) + 
+  facet_wrap(~publisher) +
+  theme_minimal() + 
+  labs(x = "Year", 
+    y="Relative Percentage", 
+    title="Character Appearances by Gender and Publisher",
+    caption="Other genders omitted for this example") 
+```
+
+By using a facet_grid() once again it is evident that female characters indeed are gaining market share in the comic book marketplace. By looking at the graph it is apparant that the proportion of female characters is indeed increasing over time.
+
+
+## Conclusion
+
+Overall this analysis I performed on the comic_characters dataset helped me gain some insight into how gender groups are represented over time within the comic book industry. I was able to see from my graphs that as a whole female characters are gaining traction and becoming more popular overall.
+
+Additionally, something interesting I found was that for bad characters women have a lower proportion than men compared to good characters. Implying that on average, female characters are more likely to be represented as good characters compared to males across publications. Additionally DC comics had a higher proportion than Marvel for females throughout the 60s and 70s which was also interesting to me.
 
