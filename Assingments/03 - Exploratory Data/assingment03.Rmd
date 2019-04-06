@@ -5,14 +5,14 @@ date: "4/5/2019"
 output: html_document
 ---
 
-# Setup
 ```{r, include=FALSE}
+# SETUP
 library(tidyverse)
 library(dplyr)
 library(fivethirtyeight)
 ```
 
-# Activity 01
+# Activity 01 - Background
 
 Let's take a look at the dataset documentation using ?comic_characters from the library fivethirtyeight.
 
@@ -41,7 +41,7 @@ Here is a list of all the variables for each row in the dataset:
 * year: year of characters first appearance, if availible
 * date: date of characters first appearance, if availible
 
-# Activity 02
+# Activity 02 - Thinking About the Data
 
 Here is a list of some categorial variables in the dataset:
 
@@ -61,25 +61,33 @@ After looking at these variables and the non-categorical ones some questions tha
 * What are the most common attributes for a good character or bad one?
 * Does the percentage of non-male characters increase over time?
 
-# Activity 03
+# Activity 03 - Graphs
 
 Let's generate some sweet visualizations to help us answer some questions! (Not those previous ones though, they were just sample questions to help me think about the data)
 
-## Question 01
+#### Question 01
 
 In	each	year	since	1961	and	for	both	publishers	combined,	what	percent	of	new	
 characters	are	male	versus	female?
 
 ```{r}
-comic_characters %>%
+d = comic_characters %>%
   filter(year >= 1961) %>%
+  mutate(male_count = nrow(subset(comic_characters, sex="Male"))) %>% 
   group_by(year, sex) %>%
   summarise(count = n()) %>%
-  ggplot(aes(x=year, y=count, color=sex)) + geom_line(stat = "identity",position="dodge")
+  mutate(proportion = count / sum(count),
+         percent = proportion * 100)
+
+  ggplot(d, aes(x=year, y=percent, color=sex)) + 
+    geom_line(stat = "identity",position="dodge") +
+    labs(x = "Year", 
+      y="Relative Percentage of Genders", 
+      title="Female Comic Book Characters are on the Rise")
 ```
 
 
-## Question 02
+#### Question 02
 
 What	proportion	of	good	versus	bad	characters	from	each	publisher	are	male	versus	
 female,	since	1961?
@@ -87,15 +95,26 @@ female,	since	1961?
 ```{r}
 comic_characters %>%
   filter(year >= 1961) %>%
-  count(year, sex) %>%
-  ggplot(mapping = aes(x = year, y = sex)) +
-  geom_tile(mapping = aes(fill = n))
+  group_by(publisher, align, sex) %>%
+  summarise(count = n()) %>%
+  ggplot(aes(x=align, y=count, color=sex)) + geom_line(stat = "identity",position="dodge")
 ```
 
-## Question 03
+#### Question 03
 
+In	each	comic	universe,	do	male	characters	or	female	characters,	on	average,	have	
+more	appearances	per	character,	just	looking	at	years	since	1961	and	characters	
+that	appear	in	comics	often (more	than	100	appearances)?
 
-# Activity 04
+```{r}
+comic_characters %>%
+  filter(year >= 1961) %>%
+  group_by(year) %>%
+  summarise(ml = nrow(subset(comic_characters, sex="Male"))) %>%
+  ggplot(aes(x=year, y=ml)) + geom_line(stat = "identity",position="dodge")
+```
 
-# Activity 05
+# Activity 04 - Improved Graphs
+
+# Activity 05 -  Report
 
