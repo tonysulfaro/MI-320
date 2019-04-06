@@ -110,11 +110,14 @@ more	appearances	per	character,	just	looking	at	years	since	1961	and	characters
 that	appear	in	comics	often (more	than	100	appearances)?
 
 ```{r}
-comic_characters %>%
-  filter(year >= 1961) %>%
-  group_by(year) %>%
-  summarise(ml = nrow(subset(comic_characters, sex="Male"))) %>%
-  ggplot(aes(x=year, y=ml)) + geom_line(stat = "identity",position="dodge")
+f = comic_characters %>% 
+  filter(year >= 1961 & (sex=="Male Characters" | sex=="Female Characters") & appearances > 100) %>%
+  group_by(year, sex) %>% 
+  summarise(count = n()) %>%
+  arrange(desc(count))
+
+ggplot(f, aes(x=year, y = count, fill=sex)) + 
+  geom_bar(stat="identity", position = "dodge")
 ```
 
 # Activity 04 - Improved Graphs
