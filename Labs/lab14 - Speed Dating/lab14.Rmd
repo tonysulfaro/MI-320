@@ -1,0 +1,72 @@
+---
+title: "Lab14 - Speed Dating Data and Joins"
+author: "tony sulfaro"
+date: "4/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(dplyr)
+dates = read_csv("dates.csv")
+people = read_csv("people.csv")
+```
+
+# Definitions 
+
+## 01
+
+Relational Data
+
+Relational data is data that relates to one another from different sources. There can be two datasets that have seperate entries but they can be combined through joins to get more information.
+
+## 02
+
+Primary Key
+
+A primary key is a specific entry in a dataset that can be used to resolve other entries in the dataset. Eg: given a timestamp it is possible to get a specific entry from the dataset by looking up the row with the timestamp and then looking across at other entries.
+
+## 03
+
+Mutating Join
+
+Add new variables to a data frame by matching observations in with one another. For example, if someone were working with some flights data and they had in one table departures and arrivals from airports and one column had a tail number they could resolve tail number to a planes table and get more information about the plane (plane type, passenger capacity, etc.).
+
+## 04
+
+Filtering Join
+
+This type of command filters entries in a dataframe based on weather or not they match an observation in a table. This is different because rather than resolve data and add it to a dataframe they are filtering records based on existence in another table. For example if there were incoming flights one could filter the rows to planes that are from a specific carrier.
+
+# Describe the Data
+
+## 05
+
+## 06
+
+## 07
+
+## 08
+
+## 09
+
+# Left Joins
+
+## 10
+
+## 11
+
+## 12
+
+## 13
+
+# Answer a Question using Relational Data
+
+## 14
+
+## 15
+
+## 16
+
+# Extra Credit
+

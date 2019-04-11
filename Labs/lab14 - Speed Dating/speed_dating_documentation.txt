@@ -1,0 +1,80 @@
+# Description:
+
+What influences love at first sight? (Or, at least, love in the first four minutes?) This dataset (http://www.stat.columbia.edu/~gelman/arm/examples/speed.dating/) was compiled by Columbia Business School professors Ray Fisman and Sheena Iyengar for their paper Gender Differences in Mate Selection: Evidence From a Speed Dating Experiment (http://faculty.chicagobooth.edu/emir.kamenica/documents/genderDifferences.pdf).
+
+Data was gathered from participants in experimental speed dating events from 2002-2004. During the events, the attendees would have a four minute "first date" with every other participant of the opposite sex. At the end of their four minutes, participants were asked if they would like to see their date again. They were also asked to rate their date on six attributes: Attractiveness, Sincerity, Intelligence, Fun, Ambition, and Shared Interests.
+
+The dataset also includes questionnaire data gathered from participants at different points in the process.
+
+For more analysis from Iyengar and Fisman, read Racial Preferences in Dating (http://faculty.chicagobooth.edu/emir.kamenica/documents/racialpreferences.pdf).
+
+
+
+# Data Tables:
+
+dates - variables about each speed date that a participant had. one row is one speed date.
+
+people - variables about each participant. one row is one person.
+
+
+## dates table
+
+iid: unique participant id; matches with iid in the people table
+round: number of dates in the speed dating session the participant was in
+position: station number where met partner 
+order: the number of date that night when met partner
+pid: partner’s iid number; matches with iid in the people table
+match: 1 = yes, 2 = no; participant and partner both answered "yes" to "Circle 'Yes' or 'No' below the ID number of each person you meet to indicate whether or not you would like to see him or her again."
+dec: 1 = yes, 2 = no; "Circle 'Yes' or 'No' below the ID number of each person you meet to indicate whether or not you would like to see him or her again."
+attr: attribute Attractive (1=awful, 10=great).
+sinc: attribute Sincere (1=awful, 10=great).
+intel: attribute Intelligent(1=awful, 10=great).
+fun: attribute Fun (1=awful, 10=great).
+amb: attribute Ambitious (1=awful, 10=great).
+shar: attribute Shared Interests/Hobbies (1=awful, 10=great).
+like: "Overall, how much do you like this person?" (1=don't like at all, 10=like a lot)
+prob: "How probable do you think it is that this person will say 'yes' for you? (1=not probable, 10=extremely probable)"
+met: 1 = yes, 2 = no; "Have you met this person before?"
+match_es: "How many matches do you estimate you will get (a match occurs when you and your partner both check 'Yes' next to decision)?" (fill in the blank)
+
+
+## people table
+
+iid: unique participant id; matches with iid and pid in the dates table
+gender: female = 0, male = 1
+age: participant's age
+race: Black/African American=1
+	European/Caucasian-American=2
+	Latino/Hispanic American=3
+	Asian/Pacific Islander/Asian-American=4
+	Native American=5
+	Other=6
+imprace: "How important is it to you (on a scale of 1-10) that a person you date be of the same racial/ethnic background?"
+imprelig: "How important is it to you (on a scale of 1-10) that a person you date be of the same religious background?"
+goal: "What is your primary goal in participating in this event?"
+	Seemed like a fun night out=1
+	To meet new people=2
+	To get a date=3
+	Looking for a serious relationship=4
+	To say I did it=5
+	Other=6
+date: "In general, how frequently do you go on dates?"
+	Several times a week=1
+	Twice a week=2
+	Once a week=3
+	Twice a month=4
+	Once a month=5
+	Several times a year=6
+	Almost never=7
+go_out: "How often do you go out (not necessarily on dates)?"
+	Several times a week=1
+	Twice a week=2
+	Once a week=3
+	Twice a month=4
+	Once a month=5
+	Several times a year=6
+	Almost never=7
+exphappy: "Overall, on a scale of 1-10, how happy do you expect to be with the people you meet 
+during the speed-dating event?"
+expnum: "Out of the 20 people you will meet, how many do you expect will be interested in dating you?"
+
