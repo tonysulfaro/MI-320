@@ -110,9 +110,35 @@ dates.people
 
 ## 14
 
+```{r}
+dates.people = dates.people %>%
+  mutate(same.race = (race.x==race.y)) %>%
+  filter(is.na(same.race) == FALSE)
+dates.people
+```
+
 ## 15
 
+```{r}
+a = dates.people %>%
+  mutate(same.race = (race.x==race.y)) %>%
+  filter(is.na(same.race) == FALSE) %>%
+  group_by(match.x, same.race) %>%
+  summarise(count = n())
+
+a
+
+ggplot(a, aes(x=match.x, y=count, fill=same.race)) + 
+  geom_bar(stat = "identity",position="dodge")
+```
+
 ## 16
+
+At first glance it may seem that race would affect weather or not people matched based how tall FALSE is on the "No" group compared to that of the "Yes" group. 
+
+However, Once you normalize the data by taking the relative percentage of yes to no values for each of the groups of bars we can see that they have similar proportions. The relative percentage of those who matched who had the same race were ~43.3% whereas the percentage of those who did not match with the same race were ~40.6%. This means that the proportion of those who said yes and no and who were in similar race groups are approximately the same.  
+
+As a result, race does not have an influence on weather or not people match when dating.
 
 # Extra Credit
 
@@ -157,5 +183,12 @@ people.courses <- tribble(
 After you	have	run	the	code	to	create	the	tables,	a	dplyr	command	that	uses	joins to	create another data	table	that	has	more	than	one	row	per	student,	and	the	columns:	last.name, first.name,	course.num,	title,	schedule,	instructor,	location,	credits,	prereqs. This	new	data table lists	which	courses	each	student	is	registered	for.
 
 ```{r}
+people
+courses
+people.courses
 
+new.table = left_join(people.courses, people, by = c("person.id" = "id"))
+new.table = left_join(new.table, courses, by = c("course.id" = "id")) %>%
+  select(last.name, first.name,	course.num,	title,	schedule,	instructor,	location,	credits,	prereqs)
+new.table
 ```
