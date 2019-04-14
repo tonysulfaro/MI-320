@@ -206,7 +206,7 @@ $(document).ready(function () {
 <div id="section-2" class="section level2">
 <h2>03</h2>
 <p>Mutating Join</p>
-<p>Add new variables to a data frame by matching observations in with one another. For example, if someone were working with some flights data and they had in one table departures and arrivals from airports and one column had a plane id they could resolve plane id to a planes table and get more information about the plane (plane type, passenger capacity, etc.).</p>
+<p>Add new variables to a data frame by matching observations in with one another. For example, if someone were working with some flights data and they had in one table departures and arrivals from airports and one column had a tail number they could resolve tail number to a planes table and get more information about the plane (plane type, passenger capacity, etc.).</p>
 </div>
 <div id="section-3" class="section level2">
 <h2>04</h2>
@@ -218,33 +218,127 @@ $(document).ready(function () {
 <h1>Describe the Data</h1>
 <div id="section-4" class="section level2">
 <h2>05</h2>
+<p>Each observation in the dates file is a date that two people went on, iid is a person and pid is the partner id that they went on the date with.</p>
 </div>
 <div id="section-5" class="section level2">
 <h2>06</h2>
+<p>There are relations between iid and pid to an entry from the people table. Each iid and pid can be used to lookup a person from the people table.</p>
 </div>
 <div id="section-6" class="section level2">
 <h2>07</h2>
+<p>Primary key of dates table = iid (id of person on date)</p>
+<p>Primary key of people table = iid (id of person on date that matches to pid in dates table)</p>
 </div>
 <div id="section-7" class="section level2">
 <h2>08</h2>
+<pre class="r"><code>dates %&gt;%
+  count(iid) %&gt;%
+  filter(n &gt;1)</code></pre>
+<pre><code>## # A tibble: 386 x 2
+##      iid     n
+##    &lt;dbl&gt; &lt;int&gt;
+##  1    21    16
+##  2    22    16
+##  3    23    16
+##  4    24    16
+##  5    25    16
+##  6    26    16
+##  7    27    16
+##  8    28    16
+##  9    29    16
+## 10    30    16
+## # … with 376 more rows</code></pre>
 </div>
 <div id="section-8" class="section level2">
 <h2>09</h2>
+<p>Add surrogate key</p>
+<pre class="r"><code>dates = dates %&gt;% 
+  mutate(surrogate.key = row_number())
+dates</code></pre>
+<pre><code>## # A tibble: 6,944 x 18
+##      iid round position order   pid match dec    attr  sinc intel   fun
+##    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1    21    16        5     6    40 No    No        6     8     7     9
+##  2    21    16        5     7    41 No    No        5     8     7     5
+##  3    21    16        5     8    42 No    Yes       8     9     8     8
+##  4    21    16        5    11    43 No    No        5     8     8     4
+##  5    21    16        5    15    44 No    No        7     7     8     5
+##  6    21    16        5     2    45 No    No        6     8     8     6
+##  7    21    16        5     5    46 No    No        6     8     8     6
+##  8    21    16        5    12    47 No    No        4     7     7     4
+##  9    21    16        5    16    48 No    No        7     7     7     5
+## 10    21    16        5     3    49 No    Yes       9     9    10     9
+## # … with 6,934 more rows, and 7 more variables: amb &lt;dbl&gt;, shar &lt;dbl&gt;,
+## #   like &lt;dbl&gt;, prob &lt;dbl&gt;, met &lt;chr&gt;, match_es &lt;dbl&gt;, surrogate.key &lt;int&gt;</code></pre>
 </div>
 </div>
 <div id="left-joins" class="section level1">
 <h1>Left Joins</h1>
 <div id="section-9" class="section level2">
 <h2>10</h2>
+<pre class="r"><code>dates.people = dates %&gt;%
+ left_join(people, dates, by = c(&quot;iid&quot; = &quot;iid&quot;)) ## join by iid = iid (resolve person not participant to their attributes)
+dates.people</code></pre>
+<pre><code>## # A tibble: 6,944 x 28
+##      iid round position order   pid match dec    attr  sinc intel   fun
+##    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1    21    16        5     6    40 No    No        6     8     7     9
+##  2    21    16        5     7    41 No    No        5     8     7     5
+##  3    21    16        5     8    42 No    Yes       8     9     8     8
+##  4    21    16        5    11    43 No    No        5     8     8     4
+##  5    21    16        5    15    44 No    No        7     7     8     5
+##  6    21    16        5     2    45 No    No        6     8     8     6
+##  7    21    16        5     5    46 No    No        6     8     8     6
+##  8    21    16        5    12    47 No    No        4     7     7     4
+##  9    21    16        5    16    48 No    No        7     7     7     5
+## 10    21    16        5     3    49 No    Yes       9     9    10     9
+## # … with 6,934 more rows, and 17 more variables: amb &lt;dbl&gt;, shar &lt;dbl&gt;,
+## #   like &lt;dbl&gt;, prob &lt;dbl&gt;, met &lt;chr&gt;, match_es &lt;dbl&gt;,
+## #   surrogate.key &lt;int&gt;, gender &lt;chr&gt;, age &lt;dbl&gt;, race &lt;dbl&gt;,
+## #   imprace &lt;dbl&gt;, imprelig &lt;dbl&gt;, goal &lt;dbl&gt;, date &lt;dbl&gt;, go_out &lt;dbl&gt;,
+## #   exphappy &lt;dbl&gt;, expnum &lt;dbl&gt;</code></pre>
 </div>
 <div id="section-10" class="section level2">
 <h2>11</h2>
+<pre class="r"><code>dates.people = dates.people %&gt;%
+  select(iid, round, position, order, pid, match, dec, attr, sinc,intel,fun,amb,shar,like,prob,met,match_es,race)
+dates.people</code></pre>
+<pre><code>## # A tibble: 6,944 x 18
+##      iid round position order   pid match dec    attr  sinc intel   fun
+##    &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1    21    16        5     6    40 No    No        6     8     7     9
+##  2    21    16        5     7    41 No    No        5     8     7     5
+##  3    21    16        5     8    42 No    Yes       8     9     8     8
+##  4    21    16        5    11    43 No    No        5     8     8     4
+##  5    21    16        5    15    44 No    No        7     7     8     5
+##  6    21    16        5     2    45 No    No        6     8     8     6
+##  7    21    16        5     5    46 No    No        6     8     8     6
+##  8    21    16        5    12    47 No    No        4     7     7     4
+##  9    21    16        5    16    48 No    No        7     7     7     5
+## 10    21    16        5     3    49 No    Yes       9     9    10     9
+## # … with 6,934 more rows, and 7 more variables: amb &lt;dbl&gt;, shar &lt;dbl&gt;,
+## #   like &lt;dbl&gt;, prob &lt;dbl&gt;, met &lt;chr&gt;, match_es &lt;dbl&gt;, race &lt;dbl&gt;</code></pre>
 </div>
 <div id="section-11" class="section level2">
 <h2>12</h2>
+<pre class="r"><code>dates.people = dates %&gt;%
+ left_join(dates.people, dates, by = c(&quot;pid&quot; = &quot;iid&quot;)) ## resolve pid to date attributes, {attribute}.y is pid attributes
+colnames(dates.people)</code></pre>
+<pre><code>##  [1] &quot;iid&quot;           &quot;round.x&quot;       &quot;position.x&quot;    &quot;order.x&quot;      
+##  [5] &quot;pid&quot;           &quot;match.x&quot;       &quot;dec.x&quot;         &quot;attr.x&quot;       
+##  [9] &quot;sinc.x&quot;        &quot;intel.x&quot;       &quot;fun.x&quot;         &quot;amb.x&quot;        
+## [13] &quot;shar.x&quot;        &quot;like.x&quot;        &quot;prob.x&quot;        &quot;met.x&quot;        
+## [17] &quot;match_es.x&quot;    &quot;surrogate.key&quot; &quot;round.y&quot;       &quot;position.y&quot;   
+## [21] &quot;order.y&quot;       &quot;pid.y&quot;         &quot;match.y&quot;       &quot;dec.y&quot;        
+## [25] &quot;attr.y&quot;        &quot;sinc.y&quot;        &quot;intel.y&quot;       &quot;fun.y&quot;        
+## [29] &quot;amb.y&quot;         &quot;shar.y&quot;        &quot;like.y&quot;        &quot;prob.y&quot;       
+## [33] &quot;met.y&quot;         &quot;match_es.y&quot;    &quot;race&quot;</code></pre>
 </div>
 <div id="section-12" class="section level2">
 <h2>13</h2>
+<pre class="r"><code>#dates.people = dates.people %&gt;%
+  #select(iid,  pid,    round,  position,   match,  like, race)
+#dates.people</code></pre>
 </div>
 </div>
 <div id="answer-a-question-using-relational-data" class="section level1">
@@ -261,6 +355,42 @@ $(document).ready(function () {
 </div>
 <div id="extra-credit" class="section level1">
 <h1>Extra Credit</h1>
+<pre class="r"><code>people &lt;- tribble(
+ ~id, ~last.name, ~first.name,
+ 1, &quot;Smith&quot;, &quot;Alexander&quot;,
+ 2, &quot;Williams&quot;, &quot;Olivia&quot;,
+ 3, &quot;Bell&quot;, &quot;Emma&quot;,
+ 4, &quot;Thompson&quot;, &quot;Liam&quot;,
+ 5, &quot;Garcia&quot;, &quot;Sophia&quot;
+)
+courses &lt;- tribble(
+ ~id, ~course.num, ~title, ~schedule, ~instructor, ~location,
+~credits, ~prereqs,
+ 1, &quot;MI220&quot;, &quot;Understanding Users&quot;, &quot;M W 3:00 PM - 4:20 PM&quot;, &quot;Wash&quot;,
+&quot;233 Communication Arts Bldg&quot;, 3, NA,
+ 2, &quot;MI250&quot;, &quot;Intro Applied Programming&quot;, &quot;M W 10:20 AM - 12:10 PM&quot;,
+&quot;Introne&quot;, &quot;C134 Holden Hall&quot;, 3, NA,
+ 3, &quot;MI320&quot;, &quot;Reasoning with Data&quot;, &quot;W 12:40 PM - 3:30 PM&quot;, &quot;Rader&quot;,
+&quot;106 Farrall Ag Eng Hall&quot;, 3, &quot;MI 220 and MI 250&quot;,
+ 4, &quot;MI350&quot;, &quot;Evaluating HCT&quot;, &quot;Tu Th 10:20 AM - 12:10 PM&quot;, &quot;Rader&quot;,
+&quot;233 Communication Arts Bldg&quot;, 3, &quot;MI 220 and MI 250&quot;,
+ 5, &quot;MI420&quot;, &quot;Interactive Prototyping&quot;, &quot;Tu Th 10:20 AM - 12:10 PM&quot;,
+&quot;Wyche&quot;, &quot;C134 Holden Hall&quot;, 3, &quot;MI 220 and MI 250&quot;
+)
+people.courses &lt;- tribble(
+ ~person.id, ~course.id,
+ 1, 1,
+ 1, 2,
+ 2, 3,
+ 2, 4,
+ 3, 4,
+ 3, 5,
+ 4, 1,
+ 4, 2,
+ 5, 3,
+ 5, 4
+)</code></pre>
+<p>After you have run the code to create the tables, a dplyr command that uses joins to create another data table that has more than one row per student, and the columns: last.name, first.name, course.num, title, schedule, instructor, location, credits, prereqs. This new data table lists which courses each student is registered for.</p>
 </div>
 
 

@@ -42,23 +42,69 @@ This type of command filters entries in a dataframe based on weather or not they
 
 ## 05
 
+Each observation in the dates file is a date that two people went on, iid is a person and pid is the partner id that they went on the date with.
+
 ## 06
+
+There are relations between iid and pid to an entry from the people table. Each iid and pid can be used to lookup a person from the people table.
 
 ## 07
 
+Primary key of dates table = iid (id of person on date)
+
+Primary key of people table = iid (id of person on date that matches to pid in dates table)
+
 ## 08
 
+```{r}
+dates %>%
+  count(iid) %>%
+  filter(n >1)
+```
+
 ## 09
+
+Add surrogate key
+
+```{r}
+dates = dates %>% 
+  mutate(surrogate.key = row_number())
+dates
+```
 
 # Left Joins
 
 ## 10
 
+```{r}
+dates.people = dates %>%
+ left_join(people, dates, by = c("iid" = "iid")) ## join by iid = iid (resolve person not participant to their attributes)
+dates.people
+```
+
 ## 11
+
+```{r}
+dates.people = dates.people %>%
+  select(iid, round, position, order, pid, match, dec, attr, sinc,intel,fun,amb,shar,like,prob,met,match_es,race)
+dates.people
+```
 
 ## 12
 
+```{r}
+dates.people = dates.people %>%
+ left_join(dates.people, dates, by = c("pid" = "iid")) ## resolve pid to date attributes, {attribute}.y is pid attributes
+colnames(dates.people)
+```
+
 ## 13
+
+```{r}
+dates.people = dates.people %>%
+  select(iid,	pid,	round.x,	position.x,	match.x,	like.x, race.x, race.y)
+dates.people
+```
 
 # Answer a Question using Relational Data
 
@@ -70,3 +116,46 @@ This type of command filters entries in a dataframe based on weather or not they
 
 # Extra Credit
 
+```{r}
+people <- tribble(
+ ~id, ~last.name, ~first.name,
+ 1, "Smith", "Alexander",
+ 2, "Williams", "Olivia",
+ 3, "Bell", "Emma",
+ 4, "Thompson", "Liam",
+ 5, "Garcia", "Sophia"
+)
+courses <- tribble(
+ ~id, ~course.num, ~title, ~schedule, ~instructor, ~location,
+~credits, ~prereqs,
+ 1, "MI220", "Understanding Users", "M W 3:00 PM - 4:20 PM", "Wash",
+"233 Communication Arts Bldg", 3, NA,
+ 2, "MI250", "Intro Applied Programming", "M W 10:20 AM - 12:10 PM",
+"Introne", "C134 Holden Hall", 3, NA,
+ 3, "MI320", "Reasoning with Data", "W 12:40 PM - 3:30 PM", "Rader",
+"106 Farrall Ag Eng Hall", 3, "MI 220 and MI 250",
+ 4, "MI350", "Evaluating HCT", "Tu Th 10:20 AM - 12:10 PM", "Rader",
+"233 Communication Arts Bldg", 3, "MI 220 and MI 250",
+ 5, "MI420", "Interactive Prototyping", "Tu Th 10:20 AM - 12:10 PM",
+"Wyche", "C134 Holden Hall", 3, "MI 220 and MI 250"
+)
+people.courses <- tribble(
+ ~person.id, ~course.id,
+ 1, 1,
+ 1, 2,
+ 2, 3,
+ 2, 4,
+ 3, 4,
+ 3, 5,
+ 4, 1,
+ 4, 2,
+ 5, 3,
+ 5, 4
+)
+```
+
+After you	have	run	the	code	to	create	the	tables,	a	dplyr	command	that	uses	joins to	create another data	table	that	has	more	than	one	row	per	student,	and	the	columns:	last.name, first.name,	course.num,	title,	schedule,	instructor,	location,	credits,	prereqs. This	new	data table lists	which	courses	each	student	is	registered	for.
+
+```{r}
+
+```
