@@ -242,34 +242,58 @@ Starting in line 131 of the Week 15 Lecture R Markdown file, there are two examp
 
 #### George Washington, First Inaugural Address
 ```{r fig.height = 3.5, fig.width = 3.5}
-
+tidyspeeches %>% 
+  filter(president == "George Washington") %>%
+  filter(title == "First Inaugural Address") %>%
+  count(word) %>% 
+  with(wordcloud(word, n, max.words = 100))
 ```
 
 
 #### Abraham Lincoln, First Inaugural Address
 ```{r fig.height = 3.5, fig.width = 3.5}
-
+tidyspeeches %>% 
+  filter(president == "Abraham Lincoln") %>%
+  filter(title == "First Inaugural Address") %>%
+  count(word) %>% 
+  with(wordcloud(word, n, max.words = 100))
 ```
 
 #### Franklin D. Roosevelt, Third Inaugural Address
 ```{r fig.height = 3.5, fig.width = 3.5}
-
+tidyspeeches %>% 
+  filter(president == "Franklin D. Roosevelt") %>%
+  filter(title == "Third Inaugural Address") %>%
+  count(word) %>% 
+  with(wordcloud(word, n, max.words = 100))
 ```
 
 #### John F. Kennedy, Inaugural Address
 ```{r fig.height = 3.5, fig.width = 3.5}
-
+tidyspeeches %>% 
+  filter(president == "John F. Kennedy") %>%
+  filter(title == "Inaugural Address") %>%
+  count(word) %>% 
+  with(wordcloud(word, n, max.words = 100))
 ```
 
 #### Barack Obama, Second Inaugural Address
 ```{r fig.height = 3.5, fig.width = 3.5}
-
+tidyspeeches %>% 
+  filter(president == "Barack Obama") %>%
+  filter(title == "Second Inaugural Address") %>%
+  count(word) %>% 
+  with(wordcloud(word, n, max.words = 100))
 ```
 
 
 #### Donald J. Trump, Inaugural Address
 ```{r fig.height = 3.5, fig.width = 3.5}
-
+tidyspeeches %>% 
+  filter(president == "Donald J. Trump") %>%
+  filter(title == "Inaugural Address") %>%
+  count(word) %>% 
+  with(wordcloud(word, n, max.words = 100))
 ```
 
 
