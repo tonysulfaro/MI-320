@@ -1,0 +1,344 @@
+---
+title: "Week 15 Lab"
+author: "Tony Sulfaro"
+date: "April 17, 2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+
+```{r setup, include=FALSE}
+# data are from:
+# https://www.kaggle.com/adhok93/presidentialaddress
+# https://www.kaggle.com/harshitagpt/us-presidents/version/1#
+
+# first you may need to install some packages: 
+  # install.packages("tidytext")
+  # install.packages("tm") -- a dependency of "topicmodels"
+  # install.packages("wordcloud")
+  # install.packages("RColorBrewer") -- a dependency of wordcloud
+
+# load the libraries
+library(tidytext)
+library(wordcloud)
+library(tidyverse)
+```
+
+## Instructions
+
+- Please read all of these instructions before you begin working.
+
+- Make a copy of this R Markdown file for this lab. You will edit your copy of this file, and turn it in for this week's lab.
+
+- You must turn in your completed lab by *11:59pm on Saturday, April 20* on D2L.
+
+- To receive full credit for this lab, you must submit three files to the appropriate location on D2L: your R Markdown file, the HTML file produced when you “Knit” your R Markdown file, and your R history file. 
+
+- If you do not submit all three files, what you turned in will be graded and then 50% of the total points you earned for the lab will be subtracted from your score. 
+
+- Where it says author: "YOUR NAME HERE" in the header of this file (above), replace YOUR NAME HERE with your own name.
+
+- If a question asks for an answer that does not involve code, type your answer in below the question.
+
+- If a question asks for R code, type your code in an R code chunk below the question.
+
+- If any of the code you turn in for the lab produces an error or otherwise does not run correctly, you can still receive partial credit if you include a comment indicating that you are aware of the error, and describing what you tried to do to correct the error and answer the question.
+
+
+## Part One: Definitions
+
+Write a definition for each term below. Use complete sentences.
+
+### Question 1: Corpus
+
+A corpus is an object that contains many strings and that is annotated with metadata. The metadata associated with it can include information like which document the string is from.
+
+### Question 2: Stop words
+
+A list of words that are to be excluded from the analysis. Words like "the", "and","I" are very common in all forms of literature and by removing them we can get a better look at what unique words are actually common within texts.
+
+### Question 3: Token
+
+
+
+### Question 4: Word cloud
+
+A word cloud is a visualization that is a grouping of words with their size representing their frequency. If the word "Data" is the most common word in a dataset then it will be the largest word in the visualization.
+
+
+## Part Two: Learn about the Data
+
+### Question 5
+
+When a new president is elected in the United States, he or she gives a speech at the inauguration ceremony. The data you will be using in this lab contains the text of inaugural addresses from all of the past US Presidents.
+
+The data files you are using in this lab came from the website Kaggle.com. Navigate to the the links below and read the documentation for the two datasets.
+
+- [Presidential Inaugural Addresses](https://www.kaggle.com/adhok93/presidentialaddress)
+- [US Presidents](https://www.kaggle.com/harshitagpt/us-presidents/version/1#)
+
+Write a few sentences below describing both datasets in your own words:
+
+The Presidential Inaugural Speeches dataset contains data on each Speech given my a president in the United States. Each entry in the dataset includes:
+
+* A Number
+* Name (President Name)
+* Inagural Address (What type of address it was, first, second)
+* Date (Date addres was given. eg: Monday, March 4, 1793)
+* Text (Full text of speech)
+
+The US Presidents dataset however just has one entry per president and some attributes associated with them such as: 
+
+* start (when president was elected)
+* end (when term ended)
+* president (who was the president)
+* prior (what their job was before president)
+* party (supporting party. eg:Federalist, Democratic)
+* vice (who the vice president was)
+
+### Question 6
+
+The data files need to be loaded and manipulated a bit to prepare them for later analysis in this lab. Run the R code Dr. Rader has provided in the code chunk below to prepare the data for analysis. Make sure you have downloaded the two data files from D2L and saved them in the same folder as this file.
+
+```{r echo=FALSE}
+# load the data
+inaug_speeches <- read_csv("inaug_speeches.csv")
+us_presidents <- read_csv("us_presidents.csv")
+
+# join together the two data tables and select the columns we want to use
+# then rename a few of the columns
+speeches <- inaug_speeches %>% 
+  inner_join(us_presidents %>% select(president, party), by=c("Name"="president")) %>% 
+  select(Name, party, `Inaugural Address`, Date, text) %>% 
+  dplyr::rename(president = Name,
+                title = `Inaugural Address`)
+
+# separate each speech into lines by semicolons and periods
+# substitute a normal space for a non-breaking space
+# remove some weird strings of numbers that appear in some of the speeches
+# remove quotation marks from beginning and end of each line
+# remove extra spaces from beginning and end of each line
+# add line numbers to each speech
+# select to rearrange columns
+speeches <- speeches %>% 
+  separate_rows(text, sep="[.]") %>% 
+  separate_rows(text, sep="[;]") %>% 
+  mutate(text = gsub("\u00A0", " ", text, fixed = TRUE), 
+         text = gsub("0097", " ", text, fixed = TRUE), 
+         text = gsub("0092", " ", text, fixed = TRUE), 
+         text = gsub("0093", " ", text, fixed = TRUE), 
+         text = gsub("0094", " ", text, fixed = TRUE), 
+         text = gsub("0085", " ", text, fixed = TRUE), 
+         text = gsub('[\"]', '', text), 
+         text = trimws(text, which="both")) %>% 
+  group_by(president, title) %>% 
+  mutate(line = row_number()) %>% 
+  ungroup() %>%
+  select(president, title, party, line, text)
+```
+
+### Question 7
+
+The two data files have been combined into one data table. Answer each questions below about the data table `speeches`. Use whatever R commands you need to in order to get the answers. Not all of the questions require you to write code.
+
+```{r}
+speeches
+```
+
+- What is each row in the data table?
+
+Each row in the new tibble is a speech (Inaugural Address) that a president gave in the past.
+
+- What are each of the columns in the data table? Include the name of each column below, and a description, including the type of data in each column.
+
+Each of the columns in the data table include variables that were in the statement "select(president, title, party, line, text)". These columns include:
+
+* president - president who gave the speech 
+* title - what kind of address it was
+* party - supporting party of the president
+* line - row number
+* text - transcript of the speech
+
+- What are the dimensions of the data table?
+
+The data table after manipulation has `r nrow(speeches)` speech entries and `r ncol(speeches)` columns (variables).
+
+
+## Part Three: Tidy Text
+
+### Question 8
+
+Describe what "tidy" text is in your own words:
+
+
+
+### Question 9
+
+In the empty R code chunk below, transform the data table `speeches` into a "tidy" text table, and save it as an object called `tidyspeeches`. Use the `unnest_tokens` function. The first argument of `unnest_tokens()` is what you want the new column containing the words to be called (you should call it `word`), and the second argument is which column has the text in it that will be broken up into tokens. *Note: there is an example of how to do this in the Week 15 lecture R Markdown file, in lines 51-52.*
+
+```{r}
+tidyspeeches = speeches %>%
+  unnest_tokens(word, text)
+tidyspeeches
+```
+
+### Question 10
+
+- The code you wrote in the previous question transformed the `speeches` data table. Describe the changes that you made to the data table, in your own words:
+
+We tokenized each of the speeches into individual words.
+
+- What are the dimensions of the new `tidyspeeches` data table, after you created it in Question 9?
+
+the new dataset `tidyspeeches` has `r nrow(tidyspeeches)` entries and `r ncol(tidyspeeches)` columns (variables).
+
+
+### Question 11
+
+In the empty R code chunk below, use the `anti_join` function along with the stopwords list included in the *tidytext* library to remove the stop words from the `tidyspeeches` data table. Save the output of this command back to the `tidyspeeches` object. *Note: there is an example of how to do this in the Week 15 lecture R Markdown file, in line 106.*
+
+```{r}
+tidyspeeches = tidyspeeches %>%
+  mutate(line = row_number()) %>% 
+  anti_join(stop_words)      # stop_words is an object in tidytext
+
+tidyspeeches
+```
+
+## Question 12
+
+Next, look at the overall word frequencies in the inaugural speech data. Run the code in the code chunk below:
+
+```{r}
+tidyspeeches %>% count(word) %>% arrange(desc(n))
+```
+
+Notice that it looks like the most common words are "government" and "people". "Country" is up there too. There are also words like "america" and "american". It seems like there are some words like these that we should probably filter out of the data table, because they are so common across the inauguration speeches.
+
+In an R code chunk below, write a dplyr command to filter out the following words:
+
+government, people, world, country, nation, america, american, americans, united, constitution, citizens
+
+Don't forget to save the result of the command back to the tidyspeeches object.
+
+```{r}
+speeches_stopwords <- tibble(word = c("government", "people", "world", "country", "nation", "america", "american", "americans", "united", "constitution", "citizens"))
+
+tidyspeeches = tidyspeeches %>%
+  anti_join(speeches_stopwords)      # stop_words is an object in tidytext
+
+tidyspeeches
+tidyspeeches %>% count(word) %>% arrange(desc(n))
+```
+
+
+## Part Four: Word Clouds
+
+### Question 13
+
+Starting in line 131 of the Week 15 Lecture R Markdown file, there are two examples of how to make word clouds out of "tidy" text data. Following those examples, create word clouds for the following presidential inauguration speeches:
+
+#### George Washington, First Inaugural Address
+```{r fig.height = 3.5, fig.width = 3.5}
+
+```
+
+
+#### Abraham Lincoln, First Inaugural Address
+```{r fig.height = 3.5, fig.width = 3.5}
+
+```
+
+#### Franklin D. Roosevelt, Third Inaugural Address
+```{r fig.height = 3.5, fig.width = 3.5}
+
+```
+
+#### John F. Kennedy, Inaugural Address
+```{r fig.height = 3.5, fig.width = 3.5}
+
+```
+
+#### Barack Obama, Second Inaugural Address
+```{r fig.height = 3.5, fig.width = 3.5}
+
+```
+
+
+#### Donald J. Trump, Inaugural Address
+```{r fig.height = 3.5, fig.width = 3.5}
+
+```
+
+
+## Part Five: Sentiment Analysis
+
+Recall that sentiment analysis requires a dictionary of words and their associated "sentiment", like positive, negative, or neutral. Fortunately, the *tidytext* library makes sentiment analysis very easy, because it has a couple of built-in sentiment dictionaries.
+
+### Question 14
+
+In the empty R code chunk below, use the "bing" sentiment dictionary that is part of the *tidytext* library to add a `sentiment` column to the `tidyspeeches` data table. Save this as a new object called `sentiments`. *Note: there is an example of how to do this starting in line 157 of the Week 15 lecture R Markdown file.*
+
+```{r}
+
+```
+
+### Question 15
+
+Graph the percent of positive and negative words in each of the six inaugural speeches you made word clouds out of, above:
+
+- George Washington, First Inaugural Address
+- Abraham Lincoln, First Inaugural Address
+- Franklin D. Roosevelt, Third Inaugural Address
+- John F. Kennedy, Inaugural Address
+- Barack Obama, Second Inaugural Address
+- Donald J. Trump, Inaugural Address
+
+The beginning of the R command is included for you below. You need to finish it. Make sure that there is one facet per president. *Note: there is an example of how to do this starting in line 183 of the Week 15 lecture R Markdown file.*
+
+```{r}
+sentiments %>% 
+  filter((president == "George Washington" & title == "First Inaugural Address") | 
+           (president == "Abraham Lincoln" & title == "First Inaugural Address") | 
+           (president == "Franklin D. Roosevelt" & title == "Third Inaugural Address") | 
+           (president == "John F. Kennedy" & title == "Inaugural Address") | 
+           (president == "Barack Obama" & title == "Second Inaugural Address") | 
+           (president == "Donald J. Trump" & title == "Inaugural Address")) %>% 
+  group_by(president, sentiment) %>% 
+
+```
+
+
+
+
+## Extra credit: TF-IDF
+
+Starting on line 306 in the Week 15 lecture R Markdown file, there is an example of how to calculate TF-IDF for a corpus, and then graph the high TF-IDF words in each of six Shakespeare plays.
+
+Following this example, calculate TF-IDF for six inaugural speeches from the `tidyspeeches` data table. You can use the same six as above, or explore other speeches, it is your choice. Because titles are not unique identifiers of speeches, the data table needs a unique identifier for each speech. This command is started for you below, including the code to create a unique identifier for each speech, `speech`.
+
+```{r}
+speeches_tfidf <- tidyspeeches %>% 
+  mutate(speech = paste(president, title)) %>% 
+
+```
+
+Then, following the example starting in line 333 in the Week 15 lecture R Markdown file, make a faceted bar graph like the one in that file showing the high TF-IDF words in each of the six speeches you have selected to graph. This is started for you below (assuming you want to use the same six speeches as above).
+
+```{r}
+tfidf_ranks <- speeches_tfidf %>%
+  filter(speech %in% c("George Washington First Inaugural Address", 
+                       "Abraham Lincoln First Inaugural Address", 
+                       "Franklin D. Roosevelt Third Inaugural Address", 
+                       "John F. Kennedy Inaugural Address", 
+                       "Barack Obama Second Inaugural Address", 
+                       "Donald J. Trump Inaugural Address")) %>% 
+  group_by(speech) %>% 
+
+  
+```
+
+
+
