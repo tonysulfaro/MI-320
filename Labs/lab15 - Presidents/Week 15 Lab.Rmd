@@ -306,7 +306,9 @@ Recall that sentiment analysis requires a dictionary of words and their associat
 In the empty R code chunk below, use the "bing" sentiment dictionary that is part of the *tidytext* library to add a `sentiment` column to the `tidyspeeches` data table. Save this as a new object called `sentiments`. *Note: there is an example of how to do this starting in line 157 of the Week 15 lecture R Markdown file.*
 
 ```{r}
-
+sentiments = tidyspeeches %>%
+  inner_join(get_sentiments("bing"))
+sentiments
 ```
 
 ### Question 15
@@ -330,8 +332,16 @@ sentiments %>%
            (president == "John F. Kennedy" & title == "Inaugural Address") | 
            (president == "Barack Obama" & title == "Second Inaugural Address") | 
            (president == "Donald J. Trump" & title == "Inaugural Address")) %>% 
-  group_by(president, sentiment) %>% 
+  group_by(president, sentiment) %>%
 
+  summarize(n = n()) %>% 
+  mutate(percent = n / sum(n) * 100) %>% 
+  ggplot(aes(x = sentiment, y = percent, fill = sentiment)) + 
+    geom_bar(stat = "identity") +
+    facet_wrap(~president) +
+    labs(x = "President", 
+      y="Percentage of Positive and Negative Words", 
+      title="Proportions of Positive and Negative Words in Presidential Inagural Speeches") 
 ```
 
 
