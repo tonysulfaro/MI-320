@@ -61,7 +61,7 @@ A list of words that are to be excluded from the analysis. Words like "the", "an
 
 ### Question 3: Token
 
-
+A token is a piece of a larger collection of information. This can be an individual word out of a string. For example if we take a speech and split it up into individual words the speech has been tokenized and a word is a token.
 
 ### Question 4: Word cloud
 
@@ -81,22 +81,10 @@ The data files you are using in this lab came from the website Kaggle.com. Navig
 
 Write a few sentences below describing both datasets in your own words:
 
-The Presidential Inaugural Speeches dataset contains data on each Speech given my a president in the United States. Each entry in the dataset includes:
+The Presidential Inaugural Speeches dataset contains data on each Speech given my a president in the United States. Each entry in the dataset includes the president name, what address it was for like the first inaugural address or just inaugural address, the date the gave the speech and then the full transcript of the speech.
 
-* A Number
-* Name (President Name)
-* Inagural Address (What type of address it was, first, second)
-* Date (Date addres was given. eg: Monday, March 4, 1793)
-* Text (Full text of speech)
+The US Presidents dataset however just has one entry per president and some attributes associated with them such as their start and end term time, who the actual president was, what their occupation was before president, their supporting party, and who their vice president was.
 
-The US Presidents dataset however just has one entry per president and some attributes associated with them such as: 
-
-* start (when president was elected)
-* end (when term ended)
-* president (who was the president)
-* prior (what their job was before president)
-* party (supporting party. eg:Federalist, Democratic)
-* vice (who the vice president was)
 
 ### Question 6
 
@@ -355,7 +343,7 @@ Following this example, calculate TF-IDF for six inaugural speeches from the `ti
 
 ```{r}
 speeches_tfidf <- tidyspeeches %>% 
-  mutate(speech = paste(president, title)) %>% 
+  mutate(speech = paste(president, title))
 
 ```
 
@@ -369,7 +357,7 @@ tfidf_ranks <- speeches_tfidf %>%
                        "John F. Kennedy Inaugural Address", 
                        "Barack Obama Second Inaugural Address", 
                        "Donald J. Trump Inaugural Address")) %>% 
-  group_by(speech) %>% 
+  group_by(speech)
 
   
 ```
