@@ -1,0 +1,76 @@
+---
+title: "Lab16 - NYC Data Deep Dive"
+author: "tony sulfaro"
+date: "4/26/2019"
+output: html_document
+---
+
+# Question 01
+
+```{r setup, include=FALSE}
+library(tidyverse)
+jobs_tibble = read_csv("week16lab_jobs.csv")
+```
+
+# Question 02
+
+Yes the object is a tibble because when I type `jobs_tibble` into the console after reading it in it spits out a tibble of dimensions 5,584 x 6. It also lists column data types as well which is helpful, something that dataframes by default do not do.
+
+# Question 03
+
+No it is not a factor because after running this code chunk it returns False.
+
+```{r}
+is.factor(jobs_tibble$occupation)
+```
+
+# Question 04
+
+```{r}
+jobs_df = data.frame(jobs_tibble)
+```
+
+The new object is a dataframe because it returns all the rows instead of the first 10. You can also do `is.data.frame(jobs_df)` to have R check the type for you and it does return `r is.data.frame(jobs_df)`, indicating that it is a dataframe.
+
+
+# Question 05
+
+```{r}
+another_tibble = as_tibble(jobs_df)
+another_tibble
+```
+
+Let's convert the dataframe back to a tibble for fun. Using the command `as.tibbl(jobs_df)` this changes the dataframe back to a tibble. We can verify it with `is.tibble(another_tibble)` which returns `r is.tibble(another_tibble)`, meaning that it is a tibble once again.
+
+# Question 06
+
+Using the tibble that was converted to a dataframe and back to a tibble, print out 20 rows instead of the default 10.
+
+```{r}
+another_tibble %>%
+  print(n=20, width = Inf)
+```
+
+# Question 07
+
+Tibbles offer a little bit more control in how they are printed and stored within the R language. Tibbles give the user a little bit more flexibility to ovverride default behavior like printing.
+
+# Question 08
+
+# Question 09
+
+# Question 10
+
+# Question 11
+
+# Question 12
+
+# Question 13
+
+# Question 14
+
+# Question 15
+
+# EC
+
+To make the data tidy Dr.Rader had to wrangle a speghetti mess of Excel sheets using the read_excel function within R. After getting the data loaded she had to manipulate the data and join it together all while asking questions on what the cell data was about and how it was supposed to be recorded. Dr. Rader was able to join seperate tabs of the Excel sheet into a single data source that was easier to build reporting off of.
