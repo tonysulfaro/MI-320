@@ -57,9 +57,20 @@ Tibbles offer a little bit more control in how they are printed and stored withi
 
 # Question 08
 
+```{r}
+untidy_data = read_csv("week16lab_untidy_data.csv")
+untidy_data
+```
+
 # Question 09
 
+The data is not tidy because there is a variable column that should be split into seperate columns per variable. tsk tsk bad data storage right there folks. There are multiple entries for a single date which is not ok. There should be one date entry then an entry for each variable in the variable column.
+
 # Question 10
+
+```{r}
+spread(untidy_data, key = variable, value = value)
+```
 
 # Question 11
 
