@@ -74,6 +74,8 @@ spread(untidy_data, key = variable, value = value)
 
 # Question 11
 
+One benefit of using datasets that are "tidy" is that they are easier to work with, rather than write complex functions to sift through variables in the "variable" column and match them up with values in the value column we can reference specific entries by looking at a single row instead of multiple.
+
 # Question 12
 
 # Question 13
