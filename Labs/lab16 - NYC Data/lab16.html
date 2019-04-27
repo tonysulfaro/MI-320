@@ -290,28 +290,137 @@ another_tibble</code></pre>
 </div>
 <div id="question-09" class="section level1">
 <h1>Question 09</h1>
+<p>The data is not tidy because there is a variable column that should be split into seperate columns per variable. tsk tsk bad data storage right there folks. There are multiple entries for a single date which is not ok. There should be one date entry then an entry for each variable in the variable column.</p>
 </div>
 <div id="question-10" class="section level1">
 <h1>Question 10</h1>
+<pre class="r"><code>spread(untidy_data, key = variable, value = value)</code></pre>
+<pre><code>## # A tibble: 20 x 4
+##    DATE        PRCP  TMAX  TMIN
+##    &lt;date&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1 1971-10-28  0       69    44
+##  2 1976-02-13  0       42    20
+##  3 1976-05-09  0       72    46
+##  4 1978-03-01  0       22    -2
+##  5 1986-08-12  0       76    45
+##  6 1990-05-31  0       75    38
+##  7 1991-06-04  0       68    45
+##  8 1992-01-06  0.01    35    31
+##  9 1993-02-28  0       33    -1
+## 10 1994-11-03  0.02    62    44
+## 11 1995-04-14  0       56    30
+## 12 1997-08-12  0.49    69    57
+## 13 1997-12-10  0.34    33    30
+## 14 2008-04-19  0       74    49
+## 15 2010-08-28  0       86    59
+## 16 2010-11-08  0       62    29
+## 17 2014-01-22  0.05    11    -3
+## 18 2015-02-18  0       13    -2
+## 19 2015-05-27  0.01    77    57
+## 20 2015-12-05  0       44    28</code></pre>
 </div>
 <div id="question-11" class="section level1">
 <h1>Question 11</h1>
+<p>One benefit of using datasets that are “tidy” is that they are easier to work with, rather than write complex functions to sift through variables in the “variable” column and match them up with values in the value column we can reference specific entries by looking at a single row instead of multiple.</p>
 </div>
 <div id="question-12" class="section level1">
 <h1>Question 12</h1>
+<pre class="r"><code>dogs_nyc = read_csv(&quot;week16lab_dogs_of_nyc.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   AnimalName = col_character(),
+##   BreedName = col_character(),
+##   ZipCode = col_double(),
+##   RowNumber = col_double(),
+##   AnimalGender = col_character(),
+##   AnimalBirthMonth = col_character(),
+##   Borough = col_character(),
+##   CommunityDistrict = col_double(),
+##   CensusTract2010 = col_double(),
+##   NTA = col_character(),
+##   CityCouncilDistrict = col_double(),
+##   CongressionalDistrict = col_double(),
+##   StateSenatorialDistrict = col_double(),
+##   LicenseIssuedDate = col_character(),
+##   LicenseExpiredDate = col_character()
+## )</code></pre>
+<pre class="r"><code>dogs_nyc</code></pre>
+<pre><code>## # A tibble: 71 x 15
+##    AnimalName BreedName ZipCode RowNumber AnimalGender AnimalBirthMonth
+##    &lt;chr&gt;      &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;           
+##  1 CHARLIE    Yorkshir…   10305     45984 M            08/01/2014 12:0…
+##  2 THAXTER    Unknown     10016      2807 M            01/01/2013 12:0…
+##  3 SNOOPY     Beagle      10306      4809 M            01/01/2004 12:0…
+##  4 MIMI       Akita       11420     50779 F            01/01/2007 12:0…
+##  5 MICKEY     Bichon F…   10462     50731 M            01/01/2009 12:0…
+##  6 SIRI       Cocker S…   10014      5274 F            10/01/2014 12:0…
+##  7 PRECIOUS   Yorkshir…   11233     51698 F            11/01/2007 12:0…
+##  8 UNKNOWN    Beagle C…   11226      5582 F            05/01/2014 12:0…
+##  9 NINO       Labrador…   11369     54002 M            01/01/2001 12:0…
+## 10 JAMIE      Yorkshir…   10309     53960 F            07/01/2009 12:0…
+## # … with 61 more rows, and 9 more variables: Borough &lt;chr&gt;,
+## #   CommunityDistrict &lt;dbl&gt;, CensusTract2010 &lt;dbl&gt;, NTA &lt;chr&gt;,
+## #   CityCouncilDistrict &lt;dbl&gt;, CongressionalDistrict &lt;dbl&gt;,
+## #   StateSenatorialDistrict &lt;dbl&gt;, LicenseIssuedDate &lt;chr&gt;,
+## #   LicenseExpiredDate &lt;chr&gt;</code></pre>
 </div>
 <div id="question-13" class="section level1">
 <h1>Question 13</h1>
+<pre class="r"><code>dogs_nyc %&gt;%
+  group_by(AnimalName, BreedName, AnimalGender, AnimalBirthMonth, ZipCode) %&gt;%
+  summarise(count = n()) %&gt;%
+  arrange(desc(count))</code></pre>
+<pre><code>## # A tibble: 61 x 6
+## # Groups:   AnimalName, BreedName, AnimalGender, AnimalBirthMonth [61]
+##    AnimalName BreedName        AnimalGender AnimalBirthMonth  ZipCode count
+##    &lt;chr&gt;      &lt;chr&gt;            &lt;chr&gt;        &lt;chr&gt;               &lt;dbl&gt; &lt;int&gt;
+##  1 CLASSY     Beagle           F            08/01/2011 12:00…   10469     2
+##  2 COCO       Maltese          M            11/01/2013 12:00…   11364     2
+##  3 ISABELLA   German Shepherd… F            01/01/2004 12:00…   10065     2
+##  4 JACO       Dachshund Cross… M            04/01/2015 12:00…   11218     2
+##  5 LITTLE     Unknown          F            10/01/2009 12:00…   11373     2
+##  6 NIKKI      Poodle, Toy      F            01/01/2000 12:00…   11426     2
+##  7 PENNY      Bull Dog, Engli… F            03/01/2010 12:00…   10011     2
+##  8 PIP        Poodle, Miniatu… M            07/01/2008 12:00…   10033     2
+##  9 SANDI      American Pit Bu… F            12/01/2012 12:00…   10035     2
+## 10 WHITEY     German Shepherd… M            01/01/2003 12:00…   11211     2
+## # … with 51 more rows</code></pre>
+<p>I created this dplyr command that essentially groups by various attributes that are associated with a dog, some nonunique ones like their name, BreedName, Gender, and the animal birth month. While it is possible that two dogs of the same breed of the same gender share the same birhday in the same zip code, it is unlikely that such an event would occur. By using these attributes we can use them as a key to get a unique pet entry in the dataset (like almost 100% of the time).</p>
 </div>
 <div id="question-14" class="section level1">
 <h1>Question 14</h1>
+<p>There are animal names that have “UNKNOWN” as the value as well as BreedName values that have “Unknown”</p>
+<p>let’s take a look at them using this</p>
+<pre class="r"><code>missing_dogs = dogs_nyc %&gt;% 
+  filter(AnimalName == &quot;UNKNOWN&quot; | BreedName == &quot;Unknown&quot;)
+missing_dogs</code></pre>
+<pre><code>## # A tibble: 11 x 15
+##    AnimalName BreedName ZipCode RowNumber AnimalGender AnimalBirthMonth
+##    &lt;chr&gt;      &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;           
+##  1 THAXTER    Unknown     10016      2807 M            01/01/2013 12:0…
+##  2 UNKNOWN    Beagle C…   11226      5582 F            05/01/2014 12:0…
+##  3 BUDDY      Unknown     11358     56166 M            01/01/2005 12:0…
+##  4 HOUDINI    Unknown     10011     67870 F            08/01/2006 12:0…
+##  5 LITTLE     Unknown     11373     14913 F            10/01/2009 12:0…
+##  6 LITTLE     Unknown     11373     75407 F            10/01/2009 12:0…
+##  7 CODY       Unknown     10065     78642 M            07/01/2009 12:0…
+##  8 SAM        Unknown     10024     28682 M            01/01/2004 12:0…
+##  9 UNKNOWN    Yorkshir…   10033    102513 F            05/01/2016 12:0…
+## 10 SAPPHIRE   Unknown     10460     33917 F            01/01/2003 12:0…
+## 11 DAISY      Unknown     11209     37632 F            02/01/2012 12:0…
+## # … with 9 more variables: Borough &lt;chr&gt;, CommunityDistrict &lt;dbl&gt;,
+## #   CensusTract2010 &lt;dbl&gt;, NTA &lt;chr&gt;, CityCouncilDistrict &lt;dbl&gt;,
+## #   CongressionalDistrict &lt;dbl&gt;, StateSenatorialDistrict &lt;dbl&gt;,
+## #   LicenseIssuedDate &lt;chr&gt;, LicenseExpiredDate &lt;chr&gt;</code></pre>
+<p>it looks like there are 11 missing values in either the AnimalName field or the BreedName field out of the 71 entries.</p>
 </div>
 <div id="question-15" class="section level1">
 <h1>Question 15</h1>
+<p>One concern when graphing the number of licenses when grouping by any attribute is the presence of duplicate entries in the dataset. Some people may have registered their pets more than once which would cause that pet to contribute to two or more places within the dataset instead of just one. One method would be to generate a key using a combination of attributes like Name, Breed, Gender, and BirthMonth to isolate individual animal entries and then graph them by Borough from there. This would eliminate duplicate entries and give a more representative depiction in the graph.</p>
 </div>
 <div id="ec" class="section level1">
 <h1>EC</h1>
-<p>To make the data tidy Dr.Rader had to wrangle a speghetti mess of Excel sheets using the read_excel function within R. After getting the data loaded she had to manipulate the data and join it together all while asking questions on what the cell data was about and how it was supposed to be recorded. Dr. Rader was able to join seperate tabs of the Excel sheet into a single data source that was easier to build reporting off of.</p>
+<p>To make the data tidy Dr.Rader had to wrangle a speghetti mess of Excel sheets using the read_excel function within R. After getting the data loaded she had to manipulate the data and join it together all while asking questions on what the cell data was about and how it was supposed to be recorded. Dr. Rader was able to join seperate tabs of the Excel sheet into a single data source that was easier to build reporting off of. This included mutating the values within the sheet and reshaping it quite a bit from the looks of it.</p>
 </div>
 
 

@@ -78,12 +78,41 @@ One benefit of using datasets that are "tidy" is that they are easier to work wi
 
 # Question 12
 
+```{r}
+dogs_nyc = read_csv("week16lab_dogs_of_nyc.csv")
+dogs_nyc
+```
+
 # Question 13
+
+```{r}
+dogs_nyc %>%
+  group_by(AnimalName, BreedName, AnimalGender, AnimalBirthMonth, ZipCode) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count))
+```
+
+I created this dplyr command that essentially groups by various attributes that are associated with a dog, some nonunique ones like their name, BreedName, Gender, and the animal birth month. While it is possible that two dogs of the same breed of the same gender share the same birhday in the same zip code, it is unlikely that such an event would occur. By using these attributes we can use them as a key to get a unique pet entry in the dataset (like almost 100% of the time).
 
 # Question 14
 
+There are animal names that have "UNKNOWN" as the value as well as BreedName values that have "Unknown"
+
+let's take a look at them using this
+
+```{r}
+missing_dogs = dogs_nyc %>% 
+  filter(AnimalName == "UNKNOWN" | BreedName == "Unknown")
+missing_dogs
+```
+
+it looks like there are `r nrow(missing_dogs)` missing values in either the AnimalName field or the BreedName field out of the `r nrow(dogs_nyc)` entries.
+
+
 # Question 15
+
+One concern when graphing the number of licenses when grouping by any attribute is the presence of duplicate entries in the dataset. Some people may have registered their pets more than once which would cause that pet to contribute to two or more places within the dataset instead of just one. One method would be to generate a key using a combination of attributes like Name, Breed, Gender, and BirthMonth to isolate individual animal entries and then graph them by Borough from there. This would eliminate duplicate entries and give a more representative depiction in the graph.
 
 # EC
 
-To make the data tidy Dr.Rader had to wrangle a speghetti mess of Excel sheets using the read_excel function within R. After getting the data loaded she had to manipulate the data and join it together all while asking questions on what the cell data was about and how it was supposed to be recorded. Dr. Rader was able to join seperate tabs of the Excel sheet into a single data source that was easier to build reporting off of.
+To make the data tidy Dr.Rader had to wrangle a speghetti mess of Excel sheets using the read_excel function within R. After getting the data loaded she had to manipulate the data and join it together all while asking questions on what the cell data was about and how it was supposed to be recorded. Dr. Rader was able to join seperate tabs of the Excel sheet into a single data source that was easier to build reporting off of. This included mutating the values within the sheet and reshaping it quite a bit from the looks of it.
