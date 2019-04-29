@@ -1,0 +1,55 @@
+---
+title: "Assignment 04 - College Data Analysis"
+author: "tony sulfaro"
+date: "4/29/2019"
+output: html_document
+---
+
+# Install Needed Dependencies
+```{r setup}
+library(fivethirtyeight)
+library(tidyverse)
+```
+
+# Data Background
+
+The college data `college_all_ages` comes from the package `fivethrityeight` as a dataset included by defualt when installed. The data contained within the dataset originally came from an American Community Survey 2010-2012. The data was collected to help give insight into the compensation and unemployment rates. This data can help us answer questions about which majors have the higest and lowest compensation rates as well as how unemployment rates compare.
+
+# Data Characteristics
+
+There are `r nrow(college_all_ages)` entries in the `college_all_ages` dataset with `r ncol(college_all_ages)` variables. An observation in this dataset is a specific major and the attributes that go along with it (like number of people with that degree and median compensation).
+
+```{r, include=FALSE}
+# Variables in the Dataset
+
+## major_code Major code, FO1DP in ACS PUMS
+
+## major - Major description
+## major_category - Category of major from Carnevale et al
+## total - Total number of people with major
+## employed - Number employed (ESR == 1 or 2)
+## employed_fulltime_yearround - Employed at least 50 weeks (WKW == 1) and at least 35 hours (WKHP >= 35)
+## unemployed - Number unemployed (ESR == 3)
+## unemployment_rate - Unemployed / (Unemployed + Employed)
+## p25th - 25th percentile of earnings
+## median - Median earnings of full-time, year-round workers
+## p75th - 75th percentile of earnings
+```
+
+# Variation within variables
+
+Let's take a look at major categories and unemployment rate.
+
+```{r}
+a = college_all_ages %>%
+  group_by(major_category) %>%
+  mutate(average_unemployment = mean(unemployment_rate), st_dev_unemployment = sd(unemployment_rate)) %>%
+  select(major_category, average_unemployment, st_dev_unemployment) %>%
+  arrange(desc(average_unemployment))
+
+a
+
+ggplot(a, aes(x=reorder(major_category, -average_unemployment), y=average_unemployment, fill=st_dev_unemployment)) + 
+  geom_bar(stat = "identity",position="dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
