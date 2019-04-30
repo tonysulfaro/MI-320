@@ -57,7 +57,7 @@ ggplot(a, aes(x=reorder(major_category, -st_dev_earnings), y=st_dev_earnings)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, include=FALSE}
 b = college_all_ages %>%
   group_by(major_category) %>%
   mutate(average_median_earnings = mean(median), median_earnings = median(median))
@@ -71,7 +71,21 @@ ggplot(b, aes(x=reorder(major_category,-average_median_earnings), y=median)) +
   theme_minimal()
 ```
 
-After generating a boxplot for each of the major categories we can see how much each of them vary as well as the range for the values. The Median pay for Engineering is the highest major category while Education is the lowest median compensation. However, because of how broad engineering is the values range from ~60k all the way up to 125k if you include outliers (~90k without).
+```{r}
+b = college_all_ages %>%
+  group_by(major_category) %>%
+  mutate(total_category = sum(total),
+    employed_fulltime_yearround_percentage = employed_fulltime_yearround/total*100, 
+         employed_part_time_percentage = (1-employed_fulltime_yearround_percentage)*100)
+b
+
+ggplot(b, mapping = aes(x=reorder(major_category,total_category), y=total_category, fill=employed_fulltime_yearround_percentage))+
+  geom_bar(stat = "identity",position="dodge") +
+  coord_flip() + 
+  facet_grid(employed_fulltime_yearround_percentage ~ median)
+```
+
+After generating a bar graph for each major category where the number of people in each category represent bar length and fill represents fulltime employment there were some interesting results. From the graph business is by far the most popular major category with education coming in second at less than half the amount of business. What was also interesting was how low fulltime employment was for education majors. This makes sense because many teachers do not each at least 50 weeks out of the year because of summer and winter breaks in schooling.
 
 # Covariation	Between	Variables
 
@@ -89,11 +103,10 @@ After looking through the various combinations of variable scatter plots I want 
 ```{r}
 c = college_all_ages %>%
   group_by(major_category) %>%
-  mutate(average_median_earnings = mean(median), unemployment_rate_percent = unemployment_rate * 100) %>%
-  select(major_category, unemployment_rate_percent, average_median_earnings)
+  mutate(average_median_earnings = mean(median), unemployment_rate_percent = unemployment_rate * 100)
 c
 ggplot(c,mapping = aes(x=reorder(major_category,-average_median_earnings), y=average_median_earnings, fill=unemployment_rate_percent)) + 
-  geom_bar(stat = "identity",position="dodge",) +
+  geom_bar(stat = "identity",position="dodge") +
   coord_flip()+
   scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
   labs(x = "Major Category", 
