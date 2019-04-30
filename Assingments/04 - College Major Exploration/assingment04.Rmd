@@ -5,8 +5,7 @@ date: "4/29/2019"
 output: html_document
 ---
 
-# Install Needed Dependencies
-```{r setup}
+```{r setup, include=FALSE}
 library(fivethirtyeight)
 library(tidyverse)
 library(GGally)
@@ -37,11 +36,11 @@ There are `r nrow(college_all_ages)` entries in the `college_all_ages` dataset w
 ## p75th - 75th percentile of earnings
 ```
 
-# Variation within variables
+# Variation within Variables
 
 Let's take a look at major categories and total compensation.
 
-```{r, include=FALSE}
+```{r barplots, include=FALSE}
 a = college_all_ages %>%
   group_by(major_category) %>%
   mutate(average_median_earnings = mean(median), st_dev_earnings = sd(median)) %>%
@@ -57,7 +56,7 @@ ggplot(a, aes(x=reorder(major_category, -st_dev_earnings), y=st_dev_earnings)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
-```{r, echo=FALSE, include=FALSE}
+```{r boxplot, echo=FALSE, include=FALSE}
 b = college_all_ages %>%
   group_by(major_category) %>%
   mutate(average_median_earnings = mean(median), median_earnings = median(median))
@@ -71,18 +70,21 @@ ggplot(b, aes(x=reorder(major_category,-average_median_earnings), y=median)) +
   theme_minimal()
 ```
 
-```{r}
+```{r, echo=FALSE}
 b = college_all_ages %>%
   group_by(major_category) %>%
-  mutate(total_category = sum(total),
+  mutate(total_category_millions = sum(total)/1000000,
     employed_fulltime_yearround_percentage = employed_fulltime_yearround/total*100, 
          employed_part_time_percentage = (1-employed_fulltime_yearround_percentage)*100)
-b
 
-ggplot(b, mapping = aes(x=reorder(major_category,total_category), y=total_category, fill=employed_fulltime_yearround_percentage))+
-  geom_bar(stat = "identity",position="dodge") +
-  coord_flip() + 
-  facet_grid(employed_fulltime_yearround_percentage ~ median)
+ggplot(b, mapping = aes(x=reorder(major_category,-total_category_millions), y=total_category_millions, fill=employed_fulltime_yearround_percentage))+
+  geom_bar(stat = "identity",position="dodge")+
+  labs(x = "Major Category", 
+    y="Number of Professionals (In Millions)", 
+    title="Number of People Employed and Working Full Time by Major",
+    fill = "Percent Employed Full Time") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 After generating a bar graph for each major category where the number of people in each category represent bar length and fill represents fulltime employment there were some interesting results. From the graph business is by far the most popular major category with education coming in second at less than half the amount of business. What was also interesting was how low fulltime employment was for education majors. This makes sense because many teachers do not each at least 50 weeks out of the year because of summer and winter breaks in schooling.
@@ -91,28 +93,42 @@ After generating a bar graph for each major category where the number of people 
 
 To help us identify trends between variables we can use `ggpairs()` to plot multiple variables against one another and obtain their r value. The r value is a number that ranges from -1.0 to 1.0 that indicates how linearly two variables correlate to one another, (-1 meaning complete negative correlation, 1 meaining complete positive correlation).
 
-```{r}
+```{r, echo=FALSE}
 college_all_ages %>%
   select(total, employed, employed_fulltime_yearround, unemployed, unemployment_rate, median) %>%
   ggpairs()
 ```
 
-After looking through the various combinations of variable scatter plots I want to know a bit more about the correltion between average compensation and unemployment rate. Let's construct a scatterplot of these two variables and split it apart by Major Category once again.
+After looking through the various combinations of variable scatter plots I want to know a bit more about the correltion between average compensation and unemployment rate. Let's construct a scatterplot with a trend line on top to verify this information.
 
-
-```{r}
+```{r, echo=FALSE}
 c = college_all_ages %>%
   group_by(major_category) %>%
   mutate(average_median_earnings = mean(median), unemployment_rate_percent = unemployment_rate * 100)
-c
+```
+
+```{r, echo=FALSE}
+ggplot(c, mapping = aes(x=unemployment_rate_percent, y= average_median_earnings))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  theme_minimal()
+```
+
+There definately seems to be a negative correlation between average compensation and unemployment rate. The less a particular field pays, the more likely the field is to have individuals unemployed. This could indicate that higher demand jobs that have higher salaries have fewer people looking for work.
+
+To help see complensation and unemployment rate by profession let's construct a barplot for each major category and compare their compensation and unemployment levels compared to one another.
+
+```{r, echo=FALSE}
 ggplot(c,mapping = aes(x=reorder(major_category,-average_median_earnings), y=average_median_earnings, fill=unemployment_rate_percent)) + 
   geom_bar(stat = "identity",position="dodge") +
   coord_flip()+
   scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
   labs(x = "Major Category", 
     y="Annual Salary in USD", 
-    title="Compensation by Major Category",
-    caption="Major Categories Arranged by Average Median Salary",
+    title="Compensation and Unemployment by Major Category",
+    caption="Major Categories Arranged by Average Category Median Salary",
     fill = "Unemployment Rate") +
   theme_minimal()
 ```
+
+The negative correlation between salary and unemployment rate is yet again evident in that the two highest paying major categories `Computers & Mathematics` and `Engineering` both have the lowest unemployment rates compared to other categories.
