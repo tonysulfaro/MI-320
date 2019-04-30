@@ -9,6 +9,7 @@ output: html_document
 ```{r setup}
 library(fivethirtyeight)
 library(tidyverse)
+library(GGally)
 ```
 
 # Data Background
@@ -38,18 +39,67 @@ There are `r nrow(college_all_ages)` entries in the `college_all_ages` dataset w
 
 # Variation within variables
 
-Let's take a look at major categories and unemployment rate.
+Let's take a look at major categories and total compensation.
 
-```{r}
+```{r, include=FALSE}
 a = college_all_ages %>%
   group_by(major_category) %>%
-  mutate(average_unemployment = mean(unemployment_rate), st_dev_unemployment = sd(unemployment_rate)) %>%
-  select(major_category, average_unemployment, st_dev_unemployment) %>%
-  arrange(desc(average_unemployment))
+  mutate(average_median_earnings = mean(median), st_dev_earnings = sd(median)) %>%
+  select(major_category, average_median_earnings, st_dev_earnings) %>%
+  arrange(desc(average_median_earnings))
 
-a
-
-ggplot(a, aes(x=reorder(major_category, -average_unemployment), y=average_unemployment, fill=st_dev_unemployment)) + 
+ggplot(a, aes(x=reorder(major_category, -average_median_earnings), y=average_median_earnings)) + 
   geom_bar(stat = "identity",position="dodge") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggplot(a, aes(x=reorder(major_category, -st_dev_earnings), y=st_dev_earnings)) + 
+  geom_bar(stat = "identity",position="dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r, echo=FALSE}
+b = college_all_ages %>%
+  group_by(major_category) %>%
+  mutate(average_median_earnings = mean(median), median_earnings = median(median))
+  
+ggplot(b, aes(x=reorder(major_category,-average_median_earnings), y=median)) + 
+  geom_boxplot() + coord_flip() +
+  labs(x = "Major Category", 
+    y="Annual Salary in USD", 
+    title="Compensation by Major Category",
+    caption="Major Categories Arranged by Average Median Salary, Outliers Indicated as Dots") +
+  theme_minimal()
+```
+
+After generating a boxplot for each of the major categories we can see how much each of them vary as well as the range for the values. The Median pay for Engineering is the highest major category while Education is the lowest median compensation. However, because of how broad engineering is the values range from ~60k all the way up to 125k if you include outliers (~90k without).
+
+# Covariation	Between	Variables
+
+To help us identify trends between variables we can use `ggpairs()` to plot multiple variables against one another and obtain their r value. The r value is a number that ranges from -1.0 to 1.0 that indicates how linearly two variables correlate to one another, (-1 meaning complete negative correlation, 1 meaining complete positive correlation).
+
+```{r}
+college_all_ages %>%
+  select(total, employed, employed_fulltime_yearround, unemployed, unemployment_rate, median) %>%
+  ggpairs()
+```
+
+After looking through the various combinations of variable scatter plots I want to know a bit more about the correltion between average compensation and unemployment rate. Let's construct a scatterplot of these two variables and split it apart by Major Category once again.
+
+
+```{r}
+c = college_all_ages %>%
+  group_by(major_category) %>%
+  mutate(average_median_earnings = mean(median), unemployment_rate_percent = unemployment_rate * 100) %>%
+  select(major_category, unemployment_rate_percent, average_median_earnings)
+c
+ggplot(c,mapping = aes(x=reorder(major_category,-average_median_earnings), y=average_median_earnings, fill=unemployment_rate_percent)) + 
+  geom_bar(stat = "identity",position="dodge",) +
+  coord_flip()+
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
+  labs(x = "Major Category", 
+    y="Annual Salary in USD", 
+    title="Compensation by Major Category",
+    caption="Major Categories Arranged by Average Median Salary",
+    fill = "Unemployment Rate") +
+  theme_minimal()
 ```
