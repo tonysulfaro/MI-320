@@ -13,27 +13,28 @@ library(GGally)
 
 # Data Background
 
-The college data `college_all_ages` comes from the package `fivethrityeight` as a dataset included by defualt when installed. The data contained within the dataset originally came from an American Community Survey 2010-2012. The data was collected to help give insight into the compensation and unemployment rates. This data can help us answer questions about which majors have the higest and lowest compensation rates as well as how unemployment rates compare.
+The college data `college_all_ages` comes from the package `fivethrityeight` as a dataset included by defualt when installed. The data contained within the dataset originally came from an American Community Survey 2010-2012. The data was collected to help give insight into the compensation and unemployment rates. This data can help us answer questions about which majors have the higest and lowest compensation rates as well as how unemployment rates compare between major categories.
+
+The data includes fields like major name, the major category it resides in (eg: Business), and some other numeric values like how many people are employed in that field, how many are unemployed, what the median salary is for that major, etc.
 
 # Data Characteristics
 
-There are `r nrow(college_all_ages)` entries in the `college_all_ages` dataset with `r ncol(college_all_ages)` variables. An observation in this dataset is a specific major and the attributes that go along with it (like number of people with that degree and median compensation).
+There are `r nrow(college_all_ages)` entries in the `college_all_ages` dataset with `r ncol(college_all_ages)` variables. An observation in this dataset is a specific major and the attributes that go along with it (like number of people with that degree and median compensation for their field).
 
 ```{r, include=FALSE}
 # Variables in the Dataset
 
-## major_code Major code, FO1DP in ACS PUMS
-
-## major - Major description
-## major_category - Category of major from Carnevale et al
-## total - Total number of people with major
-## employed - Number employed (ESR == 1 or 2)
-## employed_fulltime_yearround - Employed at least 50 weeks (WKW == 1) and at least 35 hours (WKHP >= 35)
-## unemployed - Number unemployed (ESR == 3)
-## unemployment_rate - Unemployed / (Unemployed + Employed)
-## p25th - 25th percentile of earnings
-## median - Median earnings of full-time, year-round workers
-## p75th - 75th percentile of earnings
+## major_code - (numeric/int)                     Major code, FO1DP in ACS PUMS
+## major - (categorical/nominal)                  Major description
+## major_category - (categorical/nominal)         Category of major from Carnevale et al
+## total - (numeric/ratio)                        Total number of people with major
+## employed - (numeric/ratio)                     Number employed (ESR == 1 or 2)
+## employed_fulltime_yearround - (numeric/ratio)  Employed at least 50 weeks (WKW == 1) and at least 35 hours (WKHP >= 35)
+## unemployed - (numeric/ratio)                   Number unemployed (ESR == 3)
+## unemployment_rate - (numeric/double)           Unemployed / (Unemployed + Employed)
+## p25th - (numeric/ratio)                        25th percentile of earnings
+## median - (numeric/ratio)                       Median earnings of full-time, year-round workers
+## p75th - (numeric/ratio)                        75th percentile of earnings
 ```
 
 # Variation within Variables
@@ -56,7 +57,7 @@ ggplot(a, aes(x=reorder(major_category, -st_dev_earnings), y=st_dev_earnings)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
-```{r boxplot, echo=FALSE, include=FALSE}
+```{r boxplot, echo=FALSE, include=TRUE}
 b = college_all_ages %>%
   group_by(major_category) %>%
   mutate(average_median_earnings = mean(median), median_earnings = median(median))
@@ -69,6 +70,12 @@ ggplot(b, aes(x=reorder(major_category,-average_median_earnings), y=median)) +
     caption="Major Categories Arranged by Average Median Salary, Outliers Indicated as Dots") +
   theme_minimal()
 ```
+
+After generating the boxplot and arranging the major categories by average median salary we can see how much some of the categories vary. To get the average median salary I added another variable using the mutate command which is just the mean of the median salaries for each major category. 
+
+Health appears to have a huge range of salaries, mostly due to an outlier at 100k+. Engineering and Industrial Arts & Consumer Services however have the widest boxes, indicating that there are majors with varying compensation amounts.
+
+In addition to salary by major category let's take a look at the number of people in each major category as well as full time employment in the form of a barplot.
 
 ```{r, echo=FALSE}
 b = college_all_ages %>%
@@ -87,7 +94,9 @@ ggplot(b, mapping = aes(x=reorder(major_category,-total_category_millions), y=to
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-After generating a bar graph for each major category where the number of people in each category represent bar length and fill represents fulltime employment there were some interesting results. From the graph business is by far the most popular major category with education coming in second at less than half the amount of business. What was also interesting was how low fulltime employment was for education majors. This makes sense because many teachers do not each at least 50 weeks out of the year because of summer and winter breaks in schooling.
+After generating a bar graph for each major category where the number of people in each category represent bar length and fill represents fulltime employment there were some interesting results. To get this information I took the total amount of people in each major category and divided by one million to adjust the y-axis values and then calculated the percent employed fulltime as a number from 0 to 100. 
+
+From the graph business is by far the most popular major category with education coming in second at less than half the amount of business. What was also interesting was how low fulltime employment was for education majors. This makes sense because many teachers do not each at least 50 weeks out of the year because of summer and winter breaks in schooling.
 
 # Covariation	Between	Variables
 
@@ -99,16 +108,16 @@ college_all_ages %>%
   ggpairs()
 ```
 
-After looking through the various combinations of variable scatter plots I want to know a bit more about the correltion between average compensation and unemployment rate. Let's construct a scatterplot with a trend line on top to verify this information.
+After looking through the various combinations of variable scatter plots I want to know a bit more about the correltion between median compensation and unemployment rate. Let's construct a scatterplot with a trend line on top to verify this information.
 
 ```{r, echo=FALSE}
 c = college_all_ages %>%
   group_by(major_category) %>%
-  mutate(average_median_earnings = mean(median), unemployment_rate_percent = unemployment_rate * 100)
+  mutate(median_earnings = median(median), unemployment_rate_percent = unemployment_rate * 100, median_unemployment = median(unemployment_rate)*100)
 ```
 
 ```{r, echo=FALSE}
-ggplot(c, mapping = aes(x=unemployment_rate_percent, y= average_median_earnings))+
+ggplot(c, mapping = aes(x=unemployment_rate_percent, y= median))+
   geom_point()+
   geom_smooth(method = "lm")+
   theme_minimal()
@@ -116,19 +125,24 @@ ggplot(c, mapping = aes(x=unemployment_rate_percent, y= average_median_earnings)
 
 There definately seems to be a negative correlation between average compensation and unemployment rate. The less a particular field pays, the more likely the field is to have individuals unemployed. This could indicate that higher demand jobs that have higher salaries have fewer people looking for work.
 
-To help see complensation and unemployment rate by profession let's construct a barplot for each major category and compare their compensation and unemployment levels compared to one another.
+To help see complensation and unemployment rate by profession let's construct a barplot for each major category and compare their compensation and unemployment levels compared to one another. From the major categories the median value for unemployment was taken instead of a mean to prevent outliers from skewing results.
 
 ```{r, echo=FALSE}
-ggplot(c,mapping = aes(x=reorder(major_category,-average_median_earnings), y=average_median_earnings, fill=unemployment_rate_percent)) + 
+ggplot(c,mapping = aes(x=reorder(major_category,-median_earnings), y=median_earnings, fill=median_unemployment)) + 
   geom_bar(stat = "identity",position="dodge") +
   coord_flip()+
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
+  scale_fill_gradient(low = "blue", high = "red") +
   labs(x = "Major Category", 
     y="Annual Salary in USD", 
     title="Compensation and Unemployment by Major Category",
-    caption="Major Categories Arranged by Average Category Median Salary",
-    fill = "Unemployment Rate") +
+    caption="Major Categories Arranged by Category Median Salary",
+    fill = "Unemployment Rate (Percent)") +
   theme_minimal()
 ```
 
-The negative correlation between salary and unemployment rate is yet again evident in that the two highest paying major categories `Computers & Mathematics` and `Engineering` both have the lowest unemployment rates compared to other categories.
+The negative correlation between salary and unemployment rate is shown in that the higher the compensation, the lower the unemployment rate tends to be. Some interesting exceptions to this trend appear to be "Education" and "Agriculture & natural Resources" which have the lowest unemployment rates out of the entire dataset.
+
+# Report  
+
+Overall, After doing some research on the college dataset I was able to learn some interesting things. Most namely which major categories have the highest percentage of full time workers. I had known previously that people involved in education were likely not to work full time but I thought it was interesting that at least 30% of those in Education worked full time (50 weeks @ 35 hours a week) during the year.
+
